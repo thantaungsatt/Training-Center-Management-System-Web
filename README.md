@@ -25,7 +25,7 @@ A full-stack web platform designed for educational and IT training institutes to
 
 ### Setup Instructions
    ```bash
-   git clone [https://github.com/thantaungsatt/training-center-management-system-web.git](https://github.com/thantaungsatt/training-center-management-system-web.git)
+   git clone [https://github.com/thantaungsatt/Training-Center-Management-System-Web.git](https://github.com/thantaungsatt/Training-Center-Management-System-Web.git)
    cd training-center-management
    Configure MySQL connection in src/main/resources/application.properties and run: mvn clean spring-boot:run
 
