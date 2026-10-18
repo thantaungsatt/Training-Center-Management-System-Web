@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/layout :: layout(~{::section})}">
+
+<body>
+    <section>
+        <header class="app-page-header">
+            <div>
+                <nav class="app-breadcrumb" aria-label="Breadcrumb"><a th:href="@{/dashboard}">Dashboard</a><span class="mx-2">/</span><a th:href="@{/students}">Students</a><span class="mx-2">/</span><span>Change class time</span></nav>
+                <h1 class="app-page-title">Change class time</h1>
+                <p class="app-page-subtitle">Move this enrollment to another time slot in the same course.</p>
+            </div>
+            <div class="app-actions"><a th:href="@{/students}" class="btn btn-app-secondary"><i class="fa-solid fa-arrow-left me-2"></i>Back to students</a></div>
+        </header>
+
+        <div class="row justify-content-center">
+            <div class="col-xl-7">
+                <div class="app-card">
+                    <div class="mb-4"><h2 class="h6 mb-1">Schedule update</h2><p class="small text-muted mb-0">The student and current class are shown for reference.</p></div>
+                    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                    <form th:action="@{/enrollments/change-time/{id}(id=${enrollment.id})}" method="post">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Student</label>
+                                <input type="text" class="form-control" th:value="${enrollment.studentName}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Current Class</label>
+                                <input type="text" class="form-control" th:value="${enrollment.className}" readonly>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">New Class Time</label>
+                                <select name="trainingClassId" class="form-select" required>
+                                    <option value="">Select class time</option>
+                                    <option th:each="classItem : ${sameCourseClasses}" th:value="${classItem.id}"
+                                        th:selected="${classItem.id == enrollment.trainingClassId}"
+                                        th:text="${classItem.courseName + ' (' + #temporals.format(classItem.startTime, 'h a') + ' - ' + #temporals.format(classItem.endTime, 'h a') + ')'}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+                            <a th:href="@{/students}" class="btn btn-app-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-app-primary">
+                                <i class="fas fa-clock me-2"></i>Update Time
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

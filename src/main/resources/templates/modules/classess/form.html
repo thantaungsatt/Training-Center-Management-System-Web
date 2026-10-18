@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layouts/layout :: layout(~{::section})}">
+<body>
+	<section>
+		<div class="app-page-header">
+			<div>
+				<nav class="app-breadcrumb" aria-label="Breadcrumb">
+					<a th:href="@{/dashboard}">Dashboard</a><span class="mx-2">/</span><a
+						th:href="@{/classes}">Classes</a><span class="mx-2">/</span><span
+						th:text="${trainingClass.id == null ? 'Create class' : 'Edit class'}">Create
+						class</span>
+				</nav>
+				<h1 class="app-page-title"
+					th:text="${trainingClass.id == null ? 'Create class' : 'Edit class'}">Create
+					class</h1>
+				<p class="app-page-subtitle">Set the schedule, course,
+					instructor, location, and capacity for this training batch.</p>
+			</div>
+			<div class="app-actions">
+				<a th:href="@{/classes}" class="btn btn-app-secondary"><i
+					class="fa-solid fa-arrow-left me-2"></i>Back to classes</a>
+			</div>
+		</div>
+		<div class="row justify-content-center">
+			<div class="col-12 col-xl-9">
+				<div class="app-card">
+					<form th:action="@{/classes/save}" th:object="${trainingClass}"
+						method="post">
+						<input type="hidden" th:field="*{id}">
+						<div class="d-flex align-items-center gap-2 mb-4">
+							<span class="app-avatar"><i
+								class="fa-regular fa-calendar-plus"></i></span>
+							<div>
+								<h2 class="h6 mb-1">Class details</h2>
+								<p class="small text-muted mb-0">Fields marked with an
+									asterisk are required.</p>
+							</div>
+						</div>
+						<div class="row g-3">
+							<div class="col-12 col-md-6">
+								<label for="startTime" class="form-label">Start time *</label><input
+									id="startTime" type="time" th:field="*{startTime}"
+									class="form-control" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label for="endTime" class="form-label">End time *</label><input
+									id="endTime" type="time" th:field="*{endTime}"
+									class="form-control" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label for="scheduleType" class="form-label">Schedule
+									type</label><select id="scheduleType" th:field="*{scheduleType}"
+									class="form-select"><option
+										th:if="${trainingClass.id == null}" value="">Select
+										schedule</option>
+									<option th:each="schedule : ${scheduleType}"
+										th:value="${schedule}" th:text="${schedule.label}"></option></select>
+							</div>
+							<div class="col-12 col-md-6">
+								<label for="courseId" class="form-label">Course *</label><select
+									id="courseId" th:field="*{courseId}" class="form-select"
+									required><option value="">Select course</option>
+									<option th:each="course : ${courses}" th:value="${course.id}"
+										th:text="${course.courseName}">Course</option></select>
+							</div>
+							<div class="col-12 col-md-6">
+								<label for="instructorId" class="form-label">Instructor
+									*</label><select id="instructorId" th:field="*{instructorId}"
+									class="form-select" required><option value="">Select
+										instructor</option>
+									<option th:each="instructor : ${instructors}"
+										th:value="${instructor.id}" th:text="${instructor.name}">Instructor</option></select>
+							</div>
+							<div class="col-12 col-md-6">
+								<label for="room" class="form-label">Room *</label><input
+									id="room" type="text" th:field="*{room}" class="form-control"
+									placeholder="e.g. Room A" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label for="maxStudents" class="form-label">Maximum
+									students *</label><input id="maxStudents" type="number" min="1"
+									th:field="*{maxStudents}" class="form-control"
+									placeholder="e.g. 25" required>
+							</div>
+						</div>
+						<div
+							class="d-flex flex-column-reverse flex-sm-row justify-content-end gap-2 mt-4 pt-3 border-top">
+							<a th:href="@{/classes}" class="btn btn-app-secondary">Cancel</a>
+							<button type="submit" class="btn btn-app-primary">
+								<i class="fa-solid fa-floppy-disk me-2"></i><span
+									th:text="${trainingClass.id == null ? 'Create class' : 'Save changes'}">Create
+									class</span>
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

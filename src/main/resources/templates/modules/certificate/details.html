@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/layout :: layout(~{::section})}">
+
+<body>
+    <section>
+        <header class="app-page-header no-print">
+            <div class="no-print">
+                <nav class="app-breadcrumb" aria-label="Breadcrumb"><a th:href="@{/dashboard}">Dashboard</a><span class="mx-2">/</span><a th:href="@{/certificates}">Certificates</a><span class="mx-2">/</span><span>Preview</span></nav>
+                <h1 class="app-page-title">Certificate preview</h1>
+                <p class="app-page-subtitle">Review the award and print a clean copy for the student.</p>
+            </div>
+            <div class="app-actions d-flex gap-2">
+                <div class="dropdown">
+                    <button class="btn btn-app-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="fa-solid fa-ellipsis me-2"></i>More
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                        <li>
+                            <a th:href="@{/certificates}" class="dropdown-item">
+                                <i class="fas fa-arrow-left me-2"></i>Back
+                            </a>
+                        </li>
+                        <li>
+                            <button type="button" onclick="window.print()" class="dropdown-item">
+                                <i class="fas fa-print me-2"></i>Print
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <style>
+            .certificate-wrap {
+                background: linear-gradient(135deg, var(--primary-soft) 0%, #f8fafc 100%);
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                padding: 16px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            }
+
+            .certificate-paper {
+                background: #fffdf8;
+                border: 6px double #818cf8;
+                border-radius: 12px;
+                padding: 56px 48px;
+                min-height: 780px;
+            }
+
+            .cert-title {
+                font-size: 48px;
+                letter-spacing: 2px;
+                color: var(--primary);
+                font-weight: 700;
+                text-transform: uppercase;
+            }
+
+            .cert-subtitle {
+                letter-spacing: 4px;
+                color: var(--muted);
+                text-transform: uppercase;
+                font-size: 12px;
+            }
+
+            .cert-brand-logo {
+                width: 78px;
+                height: 78px;
+                object-fit: contain;
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+            }
+
+            .cert-brand-name {
+                font-size: 26px;
+                font-weight: 700;
+                color: var(--ink);
+                letter-spacing: 1px;
+                text-transform: uppercase;
+            }
+
+            .cert-name {
+                font-size: 42px;
+                font-weight: 700;
+                color: var(--ink);
+                border-bottom: 2px solid #c7d2fe;
+                display: inline-block;
+                padding: 0 24px 6px;
+                margin-top: 6px;
+            }
+
+            .cert-course {
+                font-size: 30px;
+                font-weight: 700;
+                color: var(--primary);
+                border-bottom: 2px solid #c7d2fe;
+                display: inline-block;
+                padding: 0 18px 6px;
+            }
+
+            .cert-meta {
+                font-size: 15px;
+                color: var(--body);
+            }
+
+            .cert-footer-line {
+                border-top: 2px solid #a5b4fc;
+                text-align: center;
+                padding-top: 8px;
+                font-size: 14px;
+                color: var(--body);
+            }
+
+            @media print {
+                @page {
+                    size: A4 portrait;
+                    margin: 8mm;
+                }
+
+                html,
+                body {
+                    width: 210mm;
+                    height: 297mm;
+                }
+
+                .top-bar,
+                #appSidebar,
+                .btn,
+                .d-flex.gap-2 {
+                    display: none !important;
+                }
+
+                .dashboard-container {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    width: 100% !important;
+                }
+
+                .certificate-wrap {
+                    box-shadow: none !important;
+                    border: none !important;
+                    padding: 0 !important;
+                    background: transparent !important;
+                    margin: 0 !important;
+                }
+
+                .certificate-paper {
+                    border-width: 6px !important;
+                    min-height: auto !important;
+                    height: calc(297mm - 16mm) !important;
+                    position: relative !important;
+                    page-break-inside: avoid;
+                }
+
+                .no-print {
+                    display: none !important;
+                }
+
+                .cert-dates-row {
+                    display: flex !important;
+                    justify-content: space-between !important;
+                    align-items: flex-start !important;
+                    gap: 12px !important;
+                    text-align: left !important;
+                }
+
+                .cert-dates-row>div {
+                    flex: 1 1 0 !important;
+                }
+
+                .cert-dates-row>div:nth-child(2) {
+                    text-align: center !important;
+                }
+
+                .cert-dates-row>div:nth-child(3) {
+                    text-align: right !important;
+                }
+
+                .cert-print-footer {
+                    position: absolute !important;
+                    left: 16mm !important;
+                    right: 16mm !important;
+                    bottom: 14mm !important;
+                    margin-top: 0 !important;
+                    padding-top: 0 !important;
+                }
+            }
+        </style>
+
+        <div class="certificate-wrap">
+            <div class="certificate-paper text-center">
+                <div class="d-flex flex-column align-items-center mb-2">
+                    <img th:src="@{/images/logo.png}" alt="Training Center Logo" class="cert-brand-logo mb-2">
+                    <div class="cert-brand-name">Kye Sin<sup>T</sup> Computer Training Center</div>
+                </div>
+                <div class="cert-title mb-3">Certificate</div>
+
+                <p class="fs-5 text-muted mb-1">This is to certify that</p>
+                <div class="cert-name mb-3" th:text="${certificate.studentName}">Student Name</div>
+
+                <p class="cert-meta mb-1">
+                    Son/Daughter of
+                    <strong
+                        th:text="${certificate.fatherName != null && !#strings.isEmpty(certificate.fatherName) ? certificate.fatherName : '-'}"></strong>
+                </p>
+                <p class="cert-meta mb-4">
+                    Date of Birth:
+                    <strong
+                        th:text="${certificate.dateOfBirth != null ? #temporals.format(certificate.dateOfBirth, 'dd MMM yyyy') : '-'}"></strong>
+                </p>
+
+                <p class="fs-5 text-muted mb-2">has successfully completed the course</p>
+                <div class="cert-course mb-3" th:text="${certificate.courseName}">Course Name</div>
+
+                <p class="cert-meta mb-4 px-lg-5"
+                    th:text="${certificate.courseDescription != null && !#strings.isEmpty(certificate.courseDescription) ? certificate.courseDescription : 'Course description is not provided.'}">
+                </p>
+
+                <div class="row g-3 mt-4 text-center justify-content-center cert-dates-row">
+                    <div class="col-md-4">
+                        <div class="cert-meta text-muted">Enrollment Date</div>
+                        <div class="fw-semibold"
+                            th:text="${certificate.enrollDate != null ? #temporals.format(certificate.enrollDate, 'dd MMM yyyy') : '-'}">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="cert-meta text-muted">Course End Date</div>
+                        <div class="fw-semibold"
+                            th:text="${certificate.endDate != null ? #temporals.format(certificate.endDate, 'dd MMM yyyy') : '-'}">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="cert-meta text-muted">Issue Date</div>
+                        <div class="fw-semibold"
+                            th:text="${certificate.issueDate != null ? #temporals.format(certificate.issueDate, 'dd MMM yyyy') : '-'}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-5 pt-4 cert-print-footer">
+                    <div class="col-6">
+                        <div class="cert-footer-line">Certificate No: <span
+                                th:text="${certificate.certificateNo}"></span></div>
+                    </div>
+                    <div class="col-6">
+                        <div class="cert-footer-line">Authorized Signature</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

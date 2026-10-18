@@ -1,0 +1,50 @@
+/* Global SaaS design system: colors, elevation, type, form, table, and status utilities. */
+:root{--primary:#4f46e5;--primary-hover:#4338ca;--primary-soft:#eef2ff;--canvas:#f8fafc;--surface:#fff;--ink:#0f172a;--body:#334155;--muted:#64748b;--line:#e2e8f0;--success:#15803d;--success-soft:#dcfce7;--warning:#b45309;--warning-soft:#fef3c7;--danger:#be123c;--danger-soft:#ffe4e6;--info:#0369a1;--info-soft:#e0f2fe;--shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px -1px rgba(0,0,0,.06);--shadow-md:0 12px 24px rgba(15,23,42,.08)}
+*{box-sizing:border-box}body{background:var(--canvas)!important;color:var(--body)!important;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;font-size:.925rem}.text-muted{color:var(--muted)!important}h1,h2,h3,h4,h5,h6{color:var(--ink);font-weight:700}.app-page-header{align-items:flex-start;display:flex;gap:1rem;justify-content:space-between;margin-bottom:1.5rem}.app-breadcrumb{color:var(--muted);font-size:.78rem;margin-bottom:.35rem}.app-breadcrumb a{color:var(--muted);text-decoration:none}.app-breadcrumb a:hover{color:var(--primary)}.app-page-title{font-size:1.5rem;letter-spacing:-.025em;margin:0}.app-page-subtitle{color:var(--muted);margin:.25rem 0 0}.app-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);padding:1.25rem}.app-card-hover{transition:box-shadow .2s ease,transform .2s ease}.app-card-hover:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}.app-filter-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);padding:1.1rem}.btn-primary,.btn-app-primary{background:var(--primary);border-color:var(--primary);border-radius:10px;font-weight:700;padding:.6rem .9rem}.btn-primary:hover,.btn-app-primary:hover{background:var(--primary-hover);border-color:var(--primary-hover)}.btn-app-secondary{background:#fff;border:1px solid #cbd5e1;border-radius:10px;color:#334155;font-weight:700;padding:.6rem .9rem}.btn-app-secondary:hover{background:#f8fafc;border-color:#94a3b8;color:#0f172a}.form-label{color:#334155;font-size:.82rem;font-weight:700;margin-bottom:.4rem}.form-control,.form-select,.russett-input{background:#fff;border:1px solid #cbd5e1!important;border-radius:10px!important;color:#0f172a;min-height:42px}.form-control::placeholder{color:#94a3b8}.form-control:focus,.form-select:focus,.russett-input:focus{border-color:#818cf8!important;box-shadow:0 0 0 3px rgba(79,70,229,.13)!important}.form-check-input:checked{background-color:var(--primary);border-color:var(--primary)}.app-table-card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);overflow:hidden}.app-table{margin:0;min-width:760px}.app-table thead th{background:#f8fafc;border-bottom:1px solid var(--line);color:#64748b;font-size:.7rem;font-weight:800;letter-spacing:.06em;padding:.85rem 1rem;text-transform:uppercase}.app-table tbody td{border-color:#eef2f7;color:#334155;padding:1rem;vertical-align:middle}.app-table tbody tr{transition:background .15s ease}.app-table tbody tr:hover{background:#f8faff}.app-avatar{align-items:center;background:var(--primary-soft);border-radius:50%;color:var(--primary);display:inline-flex;font-size:.74rem;font-weight:800;height:34px;justify-content:center;width:34px}.status-pill{border-radius:999px;display:inline-flex;font-size:.72rem;font-weight:800;line-height:1;padding:.43rem .65rem}.status-active,.status-paid{background:var(--success-soft);color:var(--success)}.status-pending,.status-partial{background:var(--warning-soft);color:var(--warning)}.status-inactive,.status-cancelled{background:#f1f5f9;color:#475569}.status-completed{background:var(--info-soft);color:var(--info)}.status-danger{background:var(--danger-soft);color:var(--danger)}.action-menu .btn{border-color:#e2e8f0;border-radius:8px;color:#64748b}.action-menu .dropdown-menu{border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-md);padding:.4rem}.action-menu .dropdown-item{border-radius:8px;font-size:.85rem;padding:.5rem .65rem}.pagination{gap:.35rem}.pagination .page-link{border:1px solid var(--line);border-radius:8px!important;color:#475569;min-width:36px;text-align:center}.pagination .page-item.active .page-link{background:var(--primary);border-color:var(--primary)}.modal-content{border:0;border-radius:16px;box-shadow:var(--shadow-md)}.modal-header,.modal-footer{border-color:var(--line)}.app-toast{border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-md)}
+@media(max-width:767.98px){.app-page-header{align-items:stretch;flex-direction:column}.app-page-header .app-actions{display:grid}.app-page-header .app-actions .btn{width:100%}.app-card,.app-filter-card{padding:1rem}.app-page-title{font-size:1.3rem}}
+.app-sidebar{background:linear-gradient(180deg,#312e81,#4338ca)!important;padding:16px!important}.app-sidebar .sidebar-brand{padding:8px 6px}.app-sidebar .sidebar-brand-text{font-size:1.05rem!important}.app-sidebar .sidebar-menu-title{color:#c7d2fe;font-size:.65rem;font-weight:800;letter-spacing:.1em;margin:20px 8px 7px;text-transform:uppercase}.app-sidebar .menu-link,.app-sidebar .menu-parent{border-radius:9px;color:#e0e7ff!important;font-size:.88rem;margin:2px 0;transition:background .15s ease,color .15s ease}.app-sidebar .menu-link:hover,.app-sidebar .menu-parent:hover,.app-sidebar .menu-link.active,.app-sidebar .menu-parent.active{background:rgba(255,255,255,.16)!important;color:#fff!important}.app-sidebar .sub-menu{border-left:1px solid rgba(224,231,255,.25);margin-left:10px;padding-left:9px!important}.app-sidebar .sidebar-footer{border-top:1px solid rgba(224,231,255,.2);padding-top:12px}.app-sidebar .sidebar-logout-btn{border-radius:9px;font-size:.82rem}@media(max-width:767.98px){.sidebar-bg.app-sidebar{transform:translateX(-100%);transition:transform .22s ease;width:270px}.sidebar-bg.app-sidebar.is-open{transform:translateX(0)}body.sidebar-collapsed .sidebar-bg.app-sidebar{transform:translateX(-100%)}}
+
+/* Shared button palette for Bootstrap variants used across all modules. */
+.btn{border-radius:10px;font-weight:700;transition:background-color .15s ease,border-color .15s ease,color .15s ease,box-shadow .15s ease}
+.btn-sm{border-radius:8px}
+.btn-danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn-danger:hover,.btn-danger:focus-visible{background:#9f1239;border-color:#9f1239;color:#fff}
+.btn-success{background:var(--success);border-color:var(--success);color:#fff}
+.btn-success:hover,.btn-success:focus-visible{background:#166534;border-color:#166534;color:#fff}
+.btn-warning{background:var(--warning);border-color:var(--warning);color:#fff}
+.btn-warning:hover,.btn-warning:focus-visible{background:#92400e;border-color:#92400e;color:#fff}
+.btn-info{background:var(--info);border-color:var(--info);color:#fff}
+.btn-info:hover,.btn-info:focus-visible{background:#075985;border-color:#075985;color:#fff}
+.btn-secondary,.btn-light{background:#fff;border:1px solid #cbd5e1;color:#334155}
+.btn-secondary:hover,.btn-light:hover{background:#f8fafc;border-color:#94a3b8;color:#0f172a}
+.btn-outline-secondary{border-color:#cbd5e1;color:#475569}
+.btn-outline-secondary:hover{background:#f8fafc;border-color:#94a3b8;color:#0f172a}
+.wizard-progress{background:rgba(255,255,255,.22);border-radius:999px;height:8px}
+.wizard-progress .progress-bar{background:#fff;border-radius:inherit}.btn-primary,.btn-app-primary{color:#fff}
+.btn-primary:hover,.btn-app-primary:hover,.btn-primary:focus-visible,.btn-app-primary:focus-visible{color:#fff}
+/* High-contrast pagination matching the indigo action palette. */
+.app-pagination .pagination{align-items:center;gap:.3rem}
+.app-pagination .page-link{align-items:center;background:#e9edf2;border:1px solid transparent;border-radius:8px!important;color:#334155;display:inline-flex;font-size:.9rem;font-weight:700;justify-content:center;min-height:38px;min-width:42px;padding:.45rem .7rem;text-decoration:none}
+.app-pagination .page-link:hover{background:#dfe4ec;border-color:#dfe4ec;color:#1e293b}
+.app-pagination .page-item.active .page-link,.app-pagination .page-item.active .page-link:hover{background:var(--primary);border-color:var(--primary);color:#fff!important}
+.app-pagination .page-item.disabled .page-link{background:#f1f5f9;border-color:transparent;color:#94a3b8;pointer-events:none}
+.schedule-weekday{background:#e0f2fe;color:#0369a1}.schedule-weekend{background:#fef3c7;color:#b45309}
+
+/* Keep the compact navigation rail visible on phones; only the expanded
+   navigation overlays the page. */
+@media (max-width: 767.98px) {
+	.sidebar-bg.app-sidebar {
+		transform: none;
+		width: 65px;
+	}
+
+	.sidebar-bg.app-sidebar.is-open {
+		transform: translateX(0);
+		width: 270px;
+	}
+
+	body.sidebar-collapsed .sidebar-bg.app-sidebar {
+		transform: none;
+		width: 65px;
+	}
+}

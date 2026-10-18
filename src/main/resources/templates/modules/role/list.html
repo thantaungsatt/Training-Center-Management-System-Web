@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layouts/layout :: layout(~{::section})}">
+<body>
+	<section>
+		<div class="app-page-header">
+			<div>
+				<nav class="app-breadcrumb" aria-label="Breadcrumb">
+					<a th:href="@{/dashboard}">Dashboard</a><span class="mx-2">/</span><span>Roles</span>
+				</nav>
+				<h1 class="app-page-title">Role management</h1>
+				<p class="app-page-subtitle">Create and manage access roles for
+					your system users.</p>
+			</div>
+		</div>
+		<div class="row g-4 align-items-start">
+			<div class="col-12 col-xl-4">
+				<div class="app-card">
+					<div class="d-flex align-items-center gap-2 mb-4">
+						<span class="app-avatar"><i class="fa-solid fa-user-shield"></i></span>
+						<div>
+							<h2 class="h6 mb-1"
+								th:text="${role.id == null ? 'Add role' : 'Edit role'}">Add
+								role</h2>
+							<p class="small text-muted mb-0">Use a clear name and unique
+								code.</p>
+						</div>
+					</div>
+					<form th:action="@{/roles/save}" th:object="${role}" method="post">
+						<input type="hidden" th:field="*{id}">
+						<div class="mb-3">
+							<label for="roleName" class="form-label">Role name *</label><input
+								id="roleName" type="text" th:field="*{name}"
+								class="form-control" placeholder="e.g. Administrator" required>
+						</div>
+						<div class="mb-4">
+							<label for="roleCode" class="form-label">Role code *</label><input
+								id="roleCode" type="text" th:field="*{code}"
+								class="form-control text-uppercase" placeholder="e.g. ADMIN"
+								required>
+						</div>
+						<div class="d-flex gap-2">
+							<a th:href="@{/roles}" class="btn btn-app-secondary flex-grow-1">Cancel</a>
+							<button type="submit" class="btn btn-app-primary flex-grow-1">
+								<i class="fa-solid fa-floppy-disk me-2"></i><span
+									th:text="${role.id == null ? 'Save role' : 'Save changes'}">Save
+									role</span>
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="col-12 col-xl-8">
+				<div class="app-table-card">
+					<div
+						class="d-flex justify-content-between align-items-center p-3 p-md-4 border-bottom">
+						<div>
+							<h2 class="h6 mb-1">System roles</h2>
+							<p class="small text-muted mb-0"
+								th:text="${totalItems} + ' roles configured'">0 roles
+								configured</p>
+						</div>
+						<span class="status-pill status-active">Access control</span>
+					</div>
+					<div class="table-responsive">
+						<table class="table app-table align-middle">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Role</th>
+									<th>Code</th>
+									<th>Created by</th>
+									<th>Updated by</th>
+									<th class="text-end">Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:if="${#lists.isEmpty(roles)}">
+									<td colspan="6" class="text-center py-5 text-muted"><i
+										class="fa-regular fa-folder-open fa-lg d-block mb-2"></i>No
+										roles configured.</td>
+								</tr>
+								<tr th:each="r, stat : ${roles}">
+									<td class="text-muted"
+										th:text="${(currentPage * pageSize) + stat.count}">1</td>
+									<td><div class="d-flex align-items-center gap-2">
+											<span class="app-avatar"><i
+												class="fa-solid fa-user-shield"></i></span><span
+												class="fw-semibold" th:text="${r.name}">Role</span>
+										</div></td>
+									<td><code class="text-primary" th:text="${r.code}">CODE</code></td>
+									<td th:text="${r.createdByName} ?: '-'">-</td>
+									<td th:text="${r.updatedByName} ?: '-'">-</td>
+									<td class="text-end"><div class="dropdown action-menu">
+											<button class="btn btn-sm btn-light" type="button"
+												data-bs-toggle="dropdown" aria-label="Role actions">
+												<i class="fa-solid fa-ellipsis"></i>
+											</button>
+											<ul class="dropdown-menu dropdown-menu-end">
+												<li><a
+													th:href="@{/roles/edit/{id}(id=${r.id},page=${currentPage})}"
+													class="dropdown-item"><i
+														class="fa-regular fa-pen-to-square me-2 text-primary"></i>Edit
+														role</a></li>
+												<li><button type="button" class="dropdown-item text-danger" th:attr="data-delete-url=@{/roles/delete/{id}(id=${r.id})},data-item-name=${r.name}" onclick="openDeleteModal(this)"><i class="fa-regular fa-trash-can me-2"></i>Delete role</button></li>
+											</ul>
+										</div></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div
+						th:replace="~{layouts/fragments/pagination :: pager('/roles', ${currentPage}, ${totalPages}, ${hasPrevious}, ${hasNext}, '', null, null, null, null, null, null)}"></div>
+				</div>
+			</div>
+		</div>
+	
+		<div class="modal fade" id="deleteModal" tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<form method="post" id="deleteForm">
+						<div class="modal-header">
+							<div><h2 class="modal-title h5 mb-1">Delete role?</h2><p class="small text-muted mb-0">This action cannot be undone.</p></div>
+							<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+						</div>
+						<div class="modal-body">Are you sure you want to delete <strong id="deleteItemName"></strong>?</div>
+						<div class="modal-footer"><button type="button" class="btn btn-app-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-danger rounded-3">Delete role</button></div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<script>
+			function openDeleteModal(button) {
+				document.getElementById('deleteItemName').textContent = button.dataset.itemName;
+				document.getElementById('deleteForm').action = button.dataset.deleteUrl;
+				bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteModal')).show();
+			}
+		</script>
+	</section>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layouts/layout :: layout(~{::section})}">
+<body>
+	<section>
+		<div class="app-page-header">
+			<div>
+				<nav class="app-breadcrumb" aria-label="Breadcrumb">
+					<a th:href="@{/dashboard}">Dashboard</a><span class="mx-2">/</span><span>Instructors</span>
+				</nav>
+				<h1 class="app-page-title">Instructor management</h1>
+				<p class="app-page-subtitle">Manage trainers and their contact
+					information.</p>
+			</div>
+			<div class="app-actions">
+				<a th:href="@{/instructors/create}" class="btn btn-app-primary"><i
+					class="fa-solid fa-user-plus me-2"></i>Add instructor</a>
+			</div>
+		</div>
+		<div class="app-filter-card mb-4">
+			<form th:action="@{/instructors}" method="get"
+				class="row g-3 align-items-end">
+				<div class="col-12 col-lg-8">
+					<label for="keyword" class="form-label">Search instructors</label>
+					<div class="position-relative">
+						<i
+							class="fa-solid fa-magnifying-glass position-absolute top-50 translate-middle-y ms-3 text-muted"></i><input
+							id="keyword" name="keyword" type="search"
+							class="form-control ps-5" placeholder="Search by instructor name"
+							th:value="${keyword}">
+					</div>
+				</div>
+				<div class="col-12 col-lg-4 d-flex gap-2">
+					<button type="submit" class="btn btn-app-primary">
+						<i class="fa-solid fa-filter me-2"></i>Filter
+					</button>
+					<a th:href="@{/instructors}" class="btn btn-app-secondary"><i
+						class="fa-solid fa-rotate-left me-2"></i>Reset</a>
+				</div>
+			</form>
+		</div>
+		<div class="app-table-card">
+			<div
+				class="d-flex justify-content-between align-items-center p-3 p-md-4 border-bottom">
+				<div>
+					<h2 class="h6 mb-1">Instructor directory</h2>
+					<p class="small text-muted mb-0"
+						th:text="${totalItems} + ' instructors found'">0 instructors
+						found</p>
+				</div>
+				<span class="status-pill status-active">Teaching team</span>
+			</div>
+			<div class="table-responsive">
+				<table class="table app-table align-middle">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Instructor</th>
+							<th>Contact</th>
+							<th>Address</th>
+							<th>Status</th>
+							<th>Created by</th>
+							<th>Updated by</th>
+							<th class="text-end">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${#lists.isEmpty(instructors)}">
+							<td colspan="8" class="text-center py-5 text-muted"><i
+								class="fa-regular fa-folder-open fa-lg d-block mb-2"></i>No
+								instructors found.</td>
+						</tr>
+						<tr th:each="instructor, stat : ${instructors}">
+							<td class="text-muted"
+								th:text="${(currentPage * pageSize) + stat.count}">1</td>
+							<td><div class="d-flex align-items-center gap-2">
+									<span class="app-avatar"
+										th:text="${#strings.substring(instructor.name,0,1)}">I</span><span
+										class="fw-semibold" th:text="${instructor.name}">Instructor</span>
+								</div></td>
+							<td><div th:text="${instructor.phoneNumber} ?: '-'">-</div>
+								<div class="small text-muted"
+									th:text="${instructor.email} ?: ''"></div></td>
+							<td th:text="${instructor.address} ?: '-'">-</td>
+							<td><span class="status-pill"
+								th:classappend="${instructor.status != null && instructor.status.name() == 'ACTIVE'} ? ' status-active' : ' status-inactive'"
+								th:text="${instructor.status != null ? instructor.status.label : 'Unknown'}">Active</span></td>
+							<td th:text="${instructor.createdByName} ?: '-'">-</td>
+							<td th:text="${instructor.updatedByName} ?: '-'">-</td>
+							<td class="text-end"><div class="dropdown action-menu">
+									<button class="btn btn-sm btn-light" type="button"
+										data-bs-toggle="dropdown" aria-label="Instructor actions">
+										<i class="fa-solid fa-ellipsis"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li><a
+											th:href="@{/instructors/edit/{id}(id=${instructor.id})}"
+											class="dropdown-item"><i
+												class="fa-regular fa-pen-to-square me-2 text-primary"></i>Edit
+												instructor</a></li>
+										<li><button type="button" class="dropdown-item text-danger" th:attr="data-delete-url=@{/instructors/delete/{id}(id=${instructor.id})},data-item-name=${instructor.name}" onclick="openDeleteModal(this)"><i class="fa-regular fa-trash-can me-2"></i>Delete instructor</button></li>
+									</ul>
+								</div></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div
+				th:replace="~{layouts/fragments/pagination :: pager('/instructors', ${currentPage}, ${totalPages}, ${hasPrevious}, ${hasNext}, ${keyword}, null, null, null, null, null, null)}"></div>
+		</div>
+	
+		<div class="modal fade" id="deleteModal" tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<form method="post" id="deleteForm">
+						<div class="modal-header">
+							<div><h2 class="modal-title h5 mb-1">Delete instructor?</h2><p class="small text-muted mb-0">This action cannot be undone.</p></div>
+							<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+						</div>
+						<div class="modal-body">Are you sure you want to delete <strong id="deleteItemName"></strong>?</div>
+						<div class="modal-footer"><button type="button" class="btn btn-app-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-danger rounded-3">Delete instructor</button></div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<script>
+			function openDeleteModal(button) {
+				document.getElementById('deleteItemName').textContent = button.dataset.itemName;
+				document.getElementById('deleteForm').action = button.dataset.deleteUrl;
+				bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteModal')).show();
+			}
+		</script>
+	</section>
+</body>
+</html>

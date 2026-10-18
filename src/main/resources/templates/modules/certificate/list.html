@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layouts/layout :: layout(~{::section})}">
+<body>
+	<section>
+		<header class="app-page-header">
+			<div>
+				<nav class="app-breadcrumb" aria-label="Breadcrumb">
+					<a th:href="@{/dashboard}">Dashboard</a><span class="mx-2">/</span><span>Certificates</span>
+				</nav>
+				<h1 class="app-page-title">Certificate management</h1>
+				<p class="app-page-subtitle">Issue, review, and track course
+					completion certificates.</p>
+			</div>
+			<div class="app-actions">
+				<a th:href="@{/certificates/create}" class="btn btn-app-primary"><i
+					class="fa-solid fa-plus me-2"></i>Issue certificate</a>
+			</div>
+		</header>
+		<div class="app-filter-card mb-4">
+			<form th:action="@{/certificates}" method="get"
+				class="row g-3 align-items-end">
+				<div class="col-12 col-lg-8">
+					<label for="keyword" class="form-label">Find a certificate</label>
+					<div class="position-relative">
+						<i
+							class="fa-solid fa-magnifying-glass position-absolute top-50 translate-middle-y ms-3 text-muted"></i><input
+							id="keyword" name="keyword" type="search"
+							class="form-control ps-5"
+							placeholder="Serial number, student, or course"
+							th:value="${keyword}">
+					</div>
+				</div>
+				<div class="col-12 col-lg-4 d-flex gap-2">
+					<button type="submit" class="btn btn-app-primary flex-grow-1">
+						<i class="fa-solid fa-filter me-2"></i>Search
+					</button>
+					<a th:href="@{/certificates}" class="btn btn-app-secondary"
+						title="Clear search"><i class="fa-solid fa-rotate-left"></i></a>
+				</div>
+			</form>
+		</div>
+		<div class="app-table-card">
+			<div
+				class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 p-3 p-md-4 border-bottom">
+				<div>
+					<h2 class="h6 mb-1">Issued certificates</h2>
+					<p class="text-muted small mb-0"
+						th:text="${totalItems} + ' records'">0 records</p>
+				</div>
+				<span class="status-pill status-completed"><i
+					class="fa-solid fa-award me-1"></i>Certificate registry</span>
+			</div>
+			<div th:if="${success}" class="alert alert-success m-3 mb-0"
+				role="status" th:text="${success}"></div>
+			<div th:if="${error}" class="alert alert-danger m-3 mb-0"
+				role="alert" th:text="${error}"></div>
+			<div class="table-responsive">
+				<table class="table app-table align-middle">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Certificate</th>
+							<th>Student</th>
+							<th>Course</th>
+							<th>Enrollment</th>
+							<th>Completed</th>
+							<th>Issued</th>
+							<th class="text-end">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${#lists.isEmpty(certificates)}">
+							<td colspan="8" class="text-center py-5 text-muted"><i
+								class="fa-regular fa-folder-open fa-lg d-block mb-2"></i>No
+								certificates found.</td>
+						</tr>
+						<tr th:each="c, stat : ${certificates}">
+							<td class="text-muted"
+								th:text="${(currentPage * pageSize) + stat.count}">1</td>
+							<td><span class="fw-semibold text-dark"
+								th:text="${c.certificateNo}">CERT-001</span>
+							<div class="small text-muted">Certificate number</div></td>
+							<td><div class="d-flex align-items-center gap-2">
+									<span class="app-avatar"
+										th:text="${#strings.isEmpty(c.studentName) ? 'S' : #strings.substring(c.studentName, 0, 1)}">S</span>
+									<div>
+										<div class="fw-semibold" th:text="${c.studentName}">Student</div>
+										<div class="small text-muted"
+											th:text="${c.fatherName != null && !#strings.isEmpty(c.fatherName) ? c.fatherName : 'Guardian not listed'}">Guardian</div>
+									</div>
+								</div></td>
+							<td th:text="${c.courseName}">Course</td>
+							<td class="text-nowrap"
+								th:text="${c.enrollDate != null ? #temporals.format(c.enrollDate, 'dd MMM yyyy') : '-'}">—</td>
+							<td class="text-nowrap"
+								th:text="${c.endDate != null ? #temporals.format(c.endDate, 'dd MMM yyyy') : '-'}">—</td>
+							<td class="text-nowrap"
+								th:text="${c.issueDate != null ? #temporals.format(c.issueDate, 'dd MMM yyyy') : '-'}">—</td>
+							<td class="text-end"><a
+								th:href="@{/certificates/details/{id}(id=${c.id})}"
+								class="btn btn-sm btn-app-secondary"
+								title="View and print certificate"><i
+									class="fa-regular fa-eye me-sm-1"></i><span
+									class="d-none d-sm-inline">View</span></a></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div th:replace="~{layouts/fragments/pagination :: pager('/certificates', ${currentPage}, ${totalPages}, ${hasPrevious}, ${hasNext}, ${keyword}, null, null, null, null, null, null)}"></div>
+		</div>
+	</section>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#4f46e5">
+<title>Sign in | Training Center</title>
+<link rel="stylesheet"
+	th:href="@{/plugins/bootstrap/css/bootstrap.min.css}">
+<link rel="stylesheet" th:href="@{/plugins/fontawesome/css/all.min.css}">
+<link rel="stylesheet" th:href="@{/css/saas.css}">
+<link rel="stylesheet" th:href="@{/css/loading.css}">
+<style>
+.auth-page {
+	background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 52%, #f8fafc 100%);
+	min-height: 100vh
+}
+
+.auth-shell {
+	min-height: 100vh
+}
+
+.auth-card {
+	background: rgba(255, 255, 255, .94);
+	border: 1px solid #e2e8f0;
+	border-radius: 22px;
+	box-shadow: 0 24px 60px rgba(30, 41, 59, .12);
+	max-width: 450px;
+	padding: 2rem;
+	width: 100%
+}
+
+.auth-logo {
+	align-items: center;
+	background: #eef2ff;
+	border-radius: 15px;
+	display: flex;
+	height: 52px;
+	justify-content: center;
+	width: 52px
+}
+
+.auth-logo img {
+	height: 37px;
+	max-width: 37px;
+	object-fit: contain
+}
+
+.auth-heading {
+	color: #0f172a;
+	font-size: 1.55rem;
+	font-weight: 800;
+	letter-spacing: -.03em
+}
+
+.auth-help {
+	color: #64748b;
+	font-size: .9rem
+}
+
+.auth-input-wrap {
+	position: relative
+}
+
+.auth-input-wrap i {
+	color: #94a3b8;
+	left: 14px;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%)
+}
+
+.auth-input-wrap .form-control {
+	padding-left: 2.6rem
+}
+
+.auth-submit {
+	min-height: 45px
+}
+
+.auth-trust {
+	color: #94a3b8;
+	font-size: .75rem
+}
+
+.auth-orb {
+	background: rgba(99, 102, 241, .15);
+	border-radius: 50%;
+	height: 260px;
+	position: fixed;
+	width: 260px;
+	z-index: 0
+}
+
+.auth-orb-one {
+	left: -85px;
+	top: -85px
+}
+
+.auth-orb-two {
+	bottom: -100px;
+	right: -80px
+}
+</style>
+</head>
+<body class="auth-page">
+	<div class="app-loading-overlay" id="appLoadingOverlay" role="status" aria-live="polite" aria-label="Loading" aria-hidden="true">
+		<div class="app-loading-spinner"><img th:src="@{/images/logo.png}" alt="Kye Sin Training Center"></div>
+		<span class="app-loading-label">Loading...</span>
+	</div>
+	<div class="auth-orb auth-orb-one"></div>
+	<div class="auth-orb auth-orb-two"></div>
+	<main
+		class="auth-shell d-flex align-items-center justify-content-center p-3 position-relative">
+		<section class="auth-card">
+			<div class="d-flex align-items-center gap-3 mb-4">
+				<div class="auth-logo">
+					<img th:src="@{/images/logo.png}" alt="Training Center logo">
+				</div>
+				<div>
+					<p class="text-uppercase fw-bold small text-primary mb-0">Training
+						Center</p>
+					<p class="text-muted small mb-0">Management Portal</p>
+				</div>
+			</div>
+			<h1 class="auth-heading mb-2">Welcome back</h1>
+			<p class="auth-help mb-4">Sign in to continue managing your
+				training center.</p>
+			<div th:if="${param.error}"
+				class="alert alert-danger border-0 rounded-3 small">
+				<i class="fa-solid fa-circle-exclamation me-2"></i>Invalid username
+				or password.
+			</div>
+			<div th:if="${param.logout}"
+				class="alert alert-success border-0 rounded-3 small">
+				<i class="fa-solid fa-circle-check me-2"></i>You have been signed
+				out successfully.
+			</div>
+			<form th:action="@{/login}" method="post">
+				<div class="mb-3">
+					<label class="form-label" for="username">Username</label>
+					<div class="auth-input-wrap">
+						<i class="fa-regular fa-user"></i><input id="username"
+							name="username" type="text" class="form-control"
+							autocomplete="username" placeholder="Enter your username"
+							required autofocus>
+					</div>
+				</div>
+				<div class="mb-4">
+					<label class="form-label" for="password">Password</label>
+					<div class="auth-input-wrap">
+						<i class="fa-solid fa-lock"></i><input id="password"
+							name="password" type="password" class="form-control"
+							autocomplete="current-password" placeholder="Enter your password"
+							required>
+					</div>
+				</div>
+				<button type="submit" class="btn btn-app-primary auth-submit w-100">
+					<i class="fa-solid fa-arrow-right-to-bracket me-2"></i>Sign in
+				</button>
+			</form>
+			<p class="auth-trust text-center mb-0 mt-4">
+				<i class="fa-solid fa-shield-halved me-1"></i>Secure access for
+				authorized staff only
+			</p>
+		</section>
+	</main>
+	<script th:src="@{/js/loading.js}"></script>
+</body>
+</html>

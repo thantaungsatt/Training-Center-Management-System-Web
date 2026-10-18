@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layouts/layout :: layout(~{::section})}">
+<body>
+	<section class="dashboard-page">
+		<div
+			class="dashboard-heading d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4">
+			<div>
+				<p class="dashboard-eyebrow mb-1">TRAINING CENTER</p>
+				<h1 class="dashboard-title mb-1">Dashboard overview</h1>
+				<p class="text-secondary mb-0">A real-time snapshot of your
+					students, classes, and collections.</p>
+			</div>
+			<div class="d-flex flex-wrap gap-2">
+				<a class="btn btn-dashboard-outline" th:href="@{/payments/create}"><i
+					class="fa-solid fa-receipt me-2"></i>Record payment</a> <a
+					class="btn btn-dashboard-outline" th:href="@{/classes/create}"><i
+					class="fa-solid fa-layer-group me-2"></i>Create class</a> <a
+					class="btn btn-dashboard-primary" th:href="@{/enrollments/enroll}"><i
+					class="fa-solid fa-user-plus me-2"></i>Add student</a>
+			</div>
+		</div>
+
+		<div class="row g-3 g-xl-4 mb-4">
+			<div class="col-sm-6 col-xl-3">
+				<article class="metric-card metric-students">
+					<div class="metric-icon">
+						<i class="fa-solid fa-user-group"></i>
+					</div>
+					<p class="metric-label">Total students</p>
+					<p class="metric-value" th:text="${dashboard.totalStudents}">0</p>
+					<p class="metric-meta mb-0">
+						<span th:text="${dashboard.activeStudents}">0</span> currently
+						active
+					</p>
+				</article>
+			</div>
+			<div class="col-sm-6 col-xl-3">
+				<article class="metric-card metric-courses">
+					<div class="metric-icon">
+						<i class="fa-solid fa-book-open"></i>
+					</div>
+					<p class="metric-label">Active classes</p>
+					<p class="metric-value" th:text="${dashboard.activeCourses}">0</p>
+					<p class="metric-meta mb-0">Configured training batches</p>
+				</article>
+			</div>
+			<div class="col-sm-6 col-xl-3">
+				<article class="metric-card metric-revenue">
+					<div class="metric-icon">
+						<i class="fa-solid fa-chart-line"></i>
+					</div>
+					<p class="metric-label">This month’s collection</p>
+					<p class="metric-value"
+						th:text="|MMK ${#numbers.formatDecimal(dashboard.monthlyRevenue, 1, 'COMMA', 0, 'POINT')}|">MMK
+						0</p>
+					<p class="metric-meta mb-0">Paid and partial payments</p>
+				</article>
+			</div>
+			<div class="col-sm-6 col-xl-3">
+				<article class="metric-card metric-instructors">
+					<div class="metric-icon">
+						<i class="fa-solid fa-chalkboard-user"></i>
+					</div>
+					<p class="metric-label">Total instructors</p>
+					<p class="metric-value" th:text="${dashboard.totalInstructors}">0</p>
+					<p class="metric-meta mb-0">Trainers in your directory</p>
+				</article>
+			</div>
+		</div>
+
+		<div class="row g-3 g-xl-4 mb-4">
+			<div class="col-xl-8">
+				<article class="dashboard-panel h-100">
+					<div class="panel-heading">
+						<div>
+							<h2>Monthly revenue</h2>
+							<p>Collected payments for the last six months</p>
+						</div>
+						<span class="panel-chip"><i
+							class="fa-solid fa-calendar-days me-1"></i>Last 6 months</span>
+					</div>
+					<div class="chart-wrap chart-wrap-wide">
+						<canvas id="revenueChart"
+							th:attr="data-labels=${#strings.listJoin(dashboard.revenueChart.labels, '|')},data-values=${#strings.listJoin(dashboard.revenueChart.values, '|')}"
+							aria-label="Monthly revenue chart" role="img"></canvas>
+					</div>
+				</article>
+			</div>
+			<div class="col-xl-4">
+				<article class="dashboard-panel h-100">
+					<div class="panel-heading">
+						<div>
+							<h2>Course enrollment</h2>
+							<p>Most popular courses</p>
+						</div>
+					</div>
+					<div class="chart-wrap chart-wrap-doughnut">
+						<canvas id="enrollmentChart"
+							th:attr="data-labels=${#strings.listJoin(dashboard.enrollmentChart.labels, '|')},data-values=${#strings.listJoin(dashboard.enrollmentChart.values, '|')}"
+							aria-label="Course enrollment distribution chart" role="img"></canvas>
+					</div>
+				</article>
+			</div>
+		</div>
+
+		<article class="dashboard-panel">
+			<div class="panel-heading">
+				<div>
+					<h2>Recent enrollments</h2>
+					<p>The latest student registrations across all courses</p>
+				</div>
+				<a th:href="@{/enrollments}" class="panel-link">View all <i
+					class="fa-solid fa-arrow-right ms-1"></i></a>
+			</div>
+			<div class="table-responsive">
+				<table class="table dashboard-table align-middle mb-0">
+					<thead>
+						<tr>
+							<th scope="col">Student</th>
+							<th scope="col">Course</th>
+							<th scope="col">Enrollment date</th>
+							<th scope="col">Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="enrollment : ${dashboard.recentEnrollments}">
+							<td><span class="student-avatar"
+								th:text="${#strings.substring(enrollment.studentName, 0, 1)}">S</span><span
+								class="fw-semibold ms-2" th:text="${enrollment.studentName}">Student</span></td>
+							<td th:text="${enrollment.courseName}">Course</td>
+							<td
+								th:text="${#temporals.format(enrollment.enrollmentDate, 'dd MMM yyyy')}">01
+								Jan 2026</td>
+							<td><span class="enrollment-status"
+								th:classappend="| status-${#strings.toLowerCase(enrollment.status.name())}|"
+								th:text="${enrollment.status.label}">Active</span></td>
+						</tr>
+						<tr th:if="${#lists.isEmpty(dashboard.recentEnrollments)}">
+							<td colspan="4" class="empty-state"><i
+								class="fa-regular fa-folder-open me-2"></i>No enrollments yet.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</article>
+
+		<style>
+.dashboard-page {
+	color: #0f172a
+}
+
+.dashboard-eyebrow {
+	color: #6f9888;
+	font-size: .72rem;
+	font-weight: 800;
+	letter-spacing: .13em
+}
+
+.dashboard-title {
+	color: var(--primary);
+	font-size: clamp(1.65rem, 3vw, 2.15rem);
+	font-weight: 800;
+	letter-spacing: -.04em
+}
+
+.btn-dashboard-primary, .btn-dashboard-outline {
+	border-radius: 10px;
+	font-weight: 700;
+	padding: .65rem .9rem
+}
+
+.btn-dashboard-primary {
+	background: var(--primary);
+	border-color: var(--primary);
+	color: #fff
+}
+
+.btn-dashboard-primary:hover {
+	background: var(--primary-hover);
+	border-color: var(--primary-hover);
+	color: #fff
+}
+
+.btn-dashboard-outline {
+	background: #fff;
+	border: 1px solid #e2e8f0;
+	color: var(--primary)
+}
+
+.btn-dashboard-outline:hover {
+	background: #f8fafc;
+	color: var(--primary)
+}
+
+.metric-card, .dashboard-panel {
+	background: #fff;
+	border: 1px solid #e2e8f0;
+	border-radius: 18px;
+	box-shadow: 0 10px 28px rgba(13, 56, 39, .06)
+}
+
+.metric-card {
+	min-height: 178px;
+	padding: 1.25rem;
+	position: relative;
+	overflow: hidden
+}
+
+.metric-card::after {
+	content: '';
+	position: absolute;
+	border-radius: 50%;
+	width: 115px;
+	height: 115px;
+	right: -42px;
+	bottom: -52px;
+	opacity: .6
+}
+
+.metric-icon {
+	align-items: center;
+	border-radius: 12px;
+	display: inline-flex;
+	font-size: 1.1rem;
+	height: 42px;
+	justify-content: center;
+	margin-bottom: 1rem;
+	position: relative;
+	width: 42px;
+	z-index: 1
+}
+
+.metric-label {
+	color: #64748b;
+	font-size: .83rem;
+	font-weight: 700;
+	margin-bottom: .22rem
+}
+
+.metric-value {
+	color: #0f172a;
+	font-size: 1.75rem;
+	font-weight: 800;
+	letter-spacing: -.04em;
+	line-height: 1.1;
+	margin-bottom: .45rem;
+	position: relative;
+	z-index: 1
+}
+
+.metric-meta {
+	color: #64748b;
+	font-size: .77rem;
+	position: relative;
+	z-index: 1
+}
+
+.metric-students .metric-icon {
+	background: #eef2ff;
+	color: var(--primary)
+}
+
+.metric-students::after {
+	background: #eef2ff
+}
+
+.metric-courses .metric-icon {
+	background: #eef0fe;
+	color: #5a68c8
+}
+
+.metric-courses::after {
+	background: #eef0fe
+}
+
+.metric-revenue .metric-icon {
+	background: #fff3e6;
+	color: #e48d27
+}
+
+.metric-revenue::after {
+	background: #fff3e6
+}
+
+.metric-instructors .metric-icon {
+	background: #f9eefa;
+	color: #a45ca8
+}
+
+.metric-instructors::after {
+	background: #f9eefa
+}
+
+.dashboard-panel {
+	padding: 1.35rem
+}
+
+.panel-heading {
+	align-items: flex-start;
+	display: flex;
+	gap: 1rem;
+	justify-content: space-between;
+	margin-bottom: 1.2rem
+}
+
+.panel-heading h2 {
+	color: #0f172a;
+	font-size: 1.06rem;
+	font-weight: 800;
+	margin: 0 0 .25rem
+}
+
+.panel-heading p {
+	color: #83948b;
+	font-size: .79rem;
+	margin: 0
+}
+
+.panel-chip {
+	background: #f8fafc;
+	border-radius: 99px;
+	color: var(--primary);
+	font-size: .7rem;
+	font-weight: 700;
+	padding: .45rem .62rem;
+	white-space: nowrap
+}
+
+.panel-link {
+	color: var(--primary);
+	font-size: .82rem;
+	font-weight: 800;
+	text-decoration: none;
+	white-space: nowrap
+}
+
+.chart-wrap {
+	position: relative
+}
+
+.chart-wrap-wide, .chart-wrap-doughnut {
+	height: 285px
+}
+
+.dashboard-table thead th {
+	border-bottom: 1px solid #e2e8f0;
+	color: #64748b;
+	font-size: .69rem;
+	font-weight: 800;
+	letter-spacing: .07em;
+	padding: .65rem .4rem .85rem;
+	text-transform: uppercase
+}
+
+.dashboard-table tbody td {
+	border-color: #e2e8f0;
+	color: #334155;
+	font-size: .88rem;
+	padding: .9rem .4rem
+}
+
+.student-avatar {
+	align-items: center;
+	background: #eef2ff;
+	border-radius: 50%;
+	color: var(--primary);
+	display: inline-flex;
+	font-size: .72rem;
+	font-weight: 800;
+	height: 30px;
+	justify-content: center;
+	width: 30px
+}
+
+.enrollment-status {
+	border-radius: 99px;
+	display: inline-block;
+	font-size: .72rem;
+	font-weight: 800;
+	padding: .33rem .62rem
+}
+
+.status-active {
+	background: #dcfce7;
+	color: #15803d
+}
+
+.status-inactive {
+	background: #f1f3f2;
+	color: #6e7a74
+}
+
+.status-completed {
+	background: #e7eefc;
+	color: #486fbd
+}
+
+.empty-state {
+	color: #64748b !important;
+	padding: 2rem !important;
+	text-align: center
+}
+
+@media ( max-width :575.98px) {
+	.dashboard-panel {
+		padding: 1rem
+	}
+	.chart-wrap-wide, .chart-wrap-doughnut {
+		height: 245px
+	}
+	.panel-chip {
+		display: none
+	}
+}
+</style>
+		<script
+			src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+		<script>
+            /* Reads server-rendered data attributes and builds the two Chart.js visuals. */
+            const chartData = canvas => ({ labels:(canvas.dataset.labels||'').split('|').filter(Boolean), values:(canvas.dataset.values||'').split('|').filter(Boolean).map(Number) });
+            const revenueCanvas=document.getElementById('revenueChart'), revenue=chartData(revenueCanvas);
+            new Chart(revenueCanvas,{type:'bar',data:{labels:revenue.labels,datasets:[{label:'Collection (MMK)',data:revenue.values,borderRadius:7,backgroundColor:'#4f46e5',hoverBackgroundColor:'#4338ca',maxBarThickness:44}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` MMK ${c.parsed.y.toLocaleString()}`}}},scales:{x:{grid:{display:false},ticks:{color:'#7e9086'}},y:{beginAtZero:true,border:{display:false},grid:{color:'#e2e8f0'},ticks:{color:'#7e9086',callback:v=>Number(v).toLocaleString()}}}}});
+            const enrollmentCanvas=document.getElementById('enrollmentChart'), enrollment=chartData(enrollmentCanvas);
+            new Chart(enrollmentCanvas,{type:'doughnut',data:{labels:enrollment.labels,datasets:[{data:enrollment.values,backgroundColor:['#4f46e5','#4c77c7','#e69a35','#a45ca8','#4f9ea0'],borderColor:'#fff',borderWidth:4,hoverOffset:6}]},options:{maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,boxHeight:10,color:'#5c7066',font:{size:11,weight:'600'},padding:16}}}}});
+        </script>
+	</section>
+</body>
+</html>

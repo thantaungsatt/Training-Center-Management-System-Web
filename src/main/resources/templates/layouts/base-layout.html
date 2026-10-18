@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE">Kye
+	Sin</title>
+
+<!-- Bootstrap -->
+<link rel="stylesheet"
+	th:href="@{/plugins/bootstrap/css/bootstrap.min.css}">
+<link rel="stylesheet" th:href="@{/plugins/fontawesome/css/all.min.css}">
+<!-- Custom CSS -->
+<link rel="stylesheet" th:href="@{/css/root.css}">
+</head>
+
+<body>
+
+	<!-- FLEX WRAPPER -->
+	<div class="d-flex">
+
+		<!-- SIDEBAR -->
+		<div th:replace="~{layouts/fragments/side-nav :: sidebar}"></div>
+
+		<!-- MAIN CONTENT -->
+		<div class="dashboard-container flex-grow-1">
+
+			<!-- CONTENT SLOT -->
+			<main>
+				<div th:replace="${content}"></div>
+			</main>
+
+		</div>
+	</div>
+	<script th:src="@{/js/menu.js}"></script>
+	<script th:src="@{/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>

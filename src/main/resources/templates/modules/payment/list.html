@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layouts/layout :: layout(~{::section})}">
+<body>
+	<section>
+		<div class="app-page-header">
+			<div>
+				<nav class="app-breadcrumb" aria-label="Breadcrumb">
+					<a th:href="@{/dashboard}">Dashboard</a><span class="mx-2">/</span><span>Payments</span>
+				</nav>
+				<h1 class="app-page-title">Payment management</h1>
+				<p class="app-page-subtitle">Track collections and manage
+					payment records for enrolled students.</p>
+			</div>
+			<div class="app-actions">
+				<a th:href="@{/payments/create}" class="btn btn-app-primary"><i
+					class="fa-solid fa-plus me-2"></i>Record payment</a>
+			</div>
+		</div>
+		<div class="app-filter-card mb-4">
+			<form th:action="@{/payments}" method="get"
+				class="row g-3 align-items-end">
+				<div class="col-12 col-lg-8">
+					<label for="keyword" class="form-label">Search payments</label>
+					<div class="position-relative">
+						<i
+							class="fa-solid fa-magnifying-glass position-absolute top-50 translate-middle-y ms-3 text-muted"></i><input
+							id="keyword" name="keyword" type="search"
+							class="form-control ps-5" placeholder="Student or course name"
+							th:value="${keyword}">
+					</div>
+				</div>
+				<div class="col-12 col-lg-4 d-flex gap-2">
+					<button type="submit" class="btn btn-app-primary">
+						<i class="fa-solid fa-filter me-2"></i>Filter
+					</button>
+					<a th:href="@{/payments}" class="btn btn-app-secondary"><i
+						class="fa-solid fa-rotate-left me-2"></i>Reset</a>
+				</div>
+			</form>
+		</div>
+		<div class="app-table-card">
+			<div
+				class="d-flex justify-content-between align-items-center p-3 p-md-4 border-bottom">
+				<div>
+					<h2 class="h6 mb-1">Payment records</h2>
+					<p class="small text-muted mb-0"
+						th:text="${totalItems} + ' payment records found'">0 payment
+						records found</p>
+				</div>
+				<span class="status-pill status-active">Collections</span>
+			</div>
+			<div class="table-responsive">
+				<table class="table app-table align-middle">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Student</th>
+							<th>Class</th>
+							<th>Amount</th>
+							<th>Date</th>
+							<th>Method</th>
+							<th>Status</th>
+							<th>Recorded by</th>
+							<th class="text-end">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${#lists.isEmpty(payments)}">
+							<td colspan="9" class="text-center py-5 text-muted"><i
+								class="fa-regular fa-folder-open fa-lg d-block mb-2"></i>No
+								payments found.</td>
+						</tr>
+						<tr th:each="p, stat : ${payments}">
+							<td class="text-muted"
+								th:text="${(currentPage * pageSize) + stat.count}">1</td>
+							<td><div class="d-flex align-items-center gap-2">
+									<span class="app-avatar"
+										th:text="${#strings.substring(p.studentName,0,1)}">S</span><span
+										class="fw-semibold" th:text="${p.studentName}">Student</span>
+								</div></td>
+							<td th:text="${p.className}">Class</td>
+							<td class="fw-semibold"
+								th:text="${p.amount != null ? 'MMK ' + #numbers.formatDecimal(p.amount,1,'COMMA',0,'POINT') : '-'}">MMK
+								0</td>
+							<td
+								th:text="${p.paymentDate != null ? #temporals.format(p.paymentDate,'dd MMM yyyy') : '-'}">-</td>
+							<td
+								th:text="${p.paymentType != null ? p.paymentType.label : '-'}">-</td>
+							<td><span class="status-pill"
+								th:classappend="${p.status != null && p.status.name() == 'PAID'} ? ' status-paid' : (${p.status != null && p.status.name() == 'PARTIAL'} ? ' status-partial' : ' status-inactive')"
+								th:text="${p.status != null ? p.status.label : 'Unknown'}">Paid</span></td>
+							<td th:text="${p.createdByName} ?: '-'">-</td>
+							<td class="text-end"><div class="dropdown action-menu">
+									<button class="btn btn-sm btn-light" type="button"
+										data-bs-toggle="dropdown" aria-label="Payment actions">
+										<i class="fa-solid fa-ellipsis"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li><a th:href="@{/payments/edit/{id}(id=${p.id})}"
+											class="dropdown-item"><i
+												class="fa-regular fa-pen-to-square me-2 text-primary"></i>Edit
+												payment</a></li>
+									</ul>
+								</div></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div
+				th:replace="~{layouts/fragments/pagination :: pager('/payments', ${currentPage}, ${totalPages}, ${hasPrevious}, ${hasNext}, ${keyword}, null, null, null, null, null, null)}"></div>
+		</div>
+	</section>
+</body>
+</html>

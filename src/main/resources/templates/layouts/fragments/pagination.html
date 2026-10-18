@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+	<nav
+		th:fragment="pager(listPath, currentPage, totalPages, hasPrevious, hasNext, keyword, courseId, classTimeId, startTime, endTime, schedule, paymentStatus)"
+		th:if="${totalPages > 0}" class="app-pagination p-3 p-md-4"
+		aria-label="Pagination">
+		<ul
+			class="pagination justify-content-center justify-content-md-end mb-0">
+			<li class="page-item" th:classappend="${!hasPrevious} ? ' disabled'"><a
+				class="page-link"
+				th:href="@{__${listPath}__(page=0,keyword=${keyword},courseId=${courseId},classTimeId=${classTimeId},startTime=${startTime},endTime=${endTime},schedule=${schedule},paymentStatus=${paymentStatus},view=${view})}"
+				aria-label="First page">First</a></li>
+			<li class="page-item" th:classappend="${!hasPrevious} ? ' disabled'"><a
+				class="page-link"
+				th:href="@{__${listPath}__(page=${currentPage - 1},keyword=${keyword},courseId=${courseId},classTimeId=${classTimeId},startTime=${startTime},endTime=${endTime},schedule=${schedule},paymentStatus=${paymentStatus},view=${view})}"
+				aria-label="Previous page"><i class="fa-solid fa-chevron-left"></i><span
+					class="visually-hidden">Previous</span></a></li>
+			<li class="page-item"
+				th:each="pageNo : ${#numbers.sequence(0, totalPages - 1)}"
+				th:classappend="${pageNo == currentPage} ? ' active'"><a
+				class="page-link"
+				th:href="@{__${listPath}__(page=${pageNo},keyword=${keyword},courseId=${courseId},classTimeId=${classTimeId},startTime=${startTime},endTime=${endTime},schedule=${schedule},paymentStatus=${paymentStatus},view=${view})}"
+				th:text="${pageNo + 1}"
+				th:attr="aria-current=${pageNo == currentPage ? 'page' : null}">1</a></li>
+			<li class="page-item" th:classappend="${!hasNext} ? ' disabled'"><a
+				class="page-link"
+				th:href="@{__${listPath}__(page=${currentPage + 1},keyword=${keyword},courseId=${courseId},classTimeId=${classTimeId},startTime=${startTime},endTime=${endTime},schedule=${schedule},paymentStatus=${paymentStatus},view=${view})}"
+				aria-label="Next page"><i class="fa-solid fa-chevron-right"></i><span
+					class="visually-hidden">Next</span></a></li>
+			<li class="page-item" th:classappend="${!hasNext} ? ' disabled'"><a
+				class="page-link"
+				th:href="@{__${listPath}__(page=${totalPages - 1},keyword=${keyword},courseId=${courseId},classTimeId=${classTimeId},startTime=${startTime},endTime=${endTime},schedule=${schedule},paymentStatus=${paymentStatus},view=${view})}"
+				aria-label="Last page">Last</a></li>
+		</ul>
+	</nav>
+</body>
+</html>

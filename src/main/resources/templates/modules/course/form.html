@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layouts/layout :: layout(~{::section})}">
+<body>
+	<section>
+		<div class="app-page-header">
+			<div>
+				<nav class="app-breadcrumb" aria-label="Breadcrumb">
+					<a th:href="@{/dashboard}">Dashboard</a><span class="mx-2">/</span><a
+						th:href="@{/courses}">Courses</a><span class="mx-2">/</span><span
+						th:text="${course.id == null ? 'Add course' : 'Edit course'}">Add
+						course</span>
+				</nav>
+				<h1 class="app-page-title"
+					th:text="${course.id == null ? 'Add course' : 'Edit course'}">Add
+					course</h1>
+				<p class="app-page-subtitle">Define course details used by
+					classes, enrollment, and certificates.</p>
+			</div>
+			<div class="app-actions">
+				<a th:href="@{/courses}" class="btn btn-app-secondary"><i
+					class="fa-solid fa-arrow-left me-2"></i>Back to courses</a>
+			</div>
+		</div>
+		<div class="row justify-content-center">
+			<div class="col-12 col-xl-9">
+				<div class="app-card">
+					<form th:action="@{/courses/save}" th:object="${course}"
+						method="post">
+						<input type="hidden" th:field="*{id}">
+						<div class="d-flex align-items-center gap-2 mb-4">
+							<span class="app-avatar"><i class="fa-solid fa-book-open"></i></span>
+							<div>
+								<h2 class="h6 mb-1">Course details</h2>
+								<p class="small text-muted mb-0">Fields marked with an
+									asterisk are required.</p>
+							</div>
+						</div>
+						<div class="row g-3">
+							<div class="col-12 col-md-6">
+								<label for="courseName" class="form-label">Course name *</label><input
+									id="courseName" type="text" th:field="*{courseName}"
+									class="form-control" placeholder="e.g. Java Fundamentals"
+									th:readonly="${course.id != null}" required>
+							</div>
+							<div class="col-12 col-md-6">
+								<label for="duration" class="form-label">Duration</label><input
+									id="duration" type="text" th:field="*{duration}"
+									class="form-control" placeholder="e.g. 3 months">
+							</div>
+							<div class="col-12 col-md-6">
+								<label for="prefix" class="form-label">Certificate
+									prefix *</label><input id="prefix" type="text" th:field="*{prefix}"
+									class="form-control text-uppercase" placeholder="e.g. JAV"
+									maxlength="20" required>
+								<div class="form-text">Short identifier used in
+									certificate numbers.</div>
+							</div>
+							<div class="col-12 col-md-6">
+								<label for="fee" class="form-label">Course fee (MMK)</label>
+								<div class="input-group">
+									<span class="input-group-text bg-light border-end-0">MMK</span><input
+										id="fee" type="number" min="0" step="0.01" th:field="*{fee}"
+										class="form-control border-start-0" placeholder="0">
+								</div>
+							</div>
+							<div class="col-12">
+								<label for="description" class="form-label">Description</label>
+								<textarea id="description" th:field="*{description}"
+									class="form-control"
+									placeholder="Briefly describe the course objectives and scope"
+									rows="4"></textarea>
+							</div>
+						</div>
+						<div
+							class="d-flex flex-column-reverse flex-sm-row justify-content-end gap-2 mt-4 pt-3 border-top">
+							<a th:href="@{/courses}" class="btn btn-app-secondary">Cancel</a>
+							<button type="submit" class="btn btn-app-primary">
+								<i class="fa-solid fa-floppy-disk me-2"></i><span
+									th:text="${course.id == null ? 'Create course' : 'Save changes'}">Create
+									course</span>
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

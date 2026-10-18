@@ -1,0 +1,71 @@
+<div th:fragment="sidebar"
+	class="sidebar-bg app-sidebar d-flex flex-column flex-shrink-0 text-white"
+	id="appSidebar">
+	<button type="button" class="sidebar-toggle-btn sidebar-edge-toggle"
+		id="sidebarToggle" aria-label="Toggle navigation">
+		<span id="sidebarToggleIcon">&lt;</span>
+	</button>
+	<a th:href="@{/dashboard}"
+		class="sidebar-brand d-flex align-items-center text-white text-decoration-none"><img
+		th:src="@{/images/logo2.png}" alt="Training Center"
+		class="sidebar-brand-logo"><span
+		class="sidebar-brand-text fw-bold">Kye Sin<sup>T</sup></span></a>
+	<p class="sidebar-menu-title sidebar-label">Workspace</p>
+	<nav aria-label="Primary navigation">
+		<a th:href="@{/dashboard}" class="nav-link menu-link p-2"><i
+			class="fa-solid fa-chart-pie me-2"></i><span class="sidebar-label">Overview</span></a>
+		<p class="sidebar-menu-title sidebar-label">Academics</p>
+		<a th:href="@{/courses}" class="nav-link menu-link p-2"><i
+			class="fa-solid fa-book-open me-2"></i><span class="sidebar-label">Courses</span></a>
+		<a th:href="@{/instructors}" class="nav-link menu-link p-2"><i
+			class="fa-solid fa-chalkboard-user me-2"></i><span
+			class="sidebar-label">Instructors</span></a> <a th:href="@{/classes}"
+			class="nav-link menu-link p-2"><i
+			class="fa-regular fa-calendar-days me-2"></i><span
+			class="sidebar-label">Classes</span></a> <a th:href="@{/students}"
+			class="nav-link menu-link p-2"><i
+			class="fa-solid fa-user-group me-2"></i><span class="sidebar-label">Students</span></a>
+		<a th:href="@{/enrollments}" class="nav-link menu-link p-2"><i
+			class="fa-solid fa-clipboard-check me-2"></i><span
+			class="sidebar-label">Enrollments</span></a> <a th:href="@{/payments}"
+			class="nav-link menu-link p-2"><i
+			class="fa-solid fa-money-bill-wave me-2"></i><span
+			class="sidebar-label">Payments</span></a> <a th:href="@{/certificates}"
+			class="nav-link menu-link p-2"><i
+			class="fa-solid fa-certificate me-2"></i><span class="sidebar-label">Certificates</span></a>
+		<p class="sidebar-menu-title sidebar-label">Administration</p>
+		<div class="user-menu">
+			<a
+				class="nav-link menu-parent d-flex align-items-center justify-content-between p-2"
+				data-bs-toggle="collapse" href="#userSubmenu" role="button"
+				aria-expanded="false"><span><i
+					class="fa-solid fa-users-gear me-2"></i><span class="sidebar-label">Users
+						&amp; roles</span></span><i class="fa-solid fa-chevron-down small arrow-icon"></i></a>
+			<div class="collapse sub-menu mt-1" id="userSubmenu">
+				<a class="nav-link menu-link p-2" th:href="@{/users}"><i
+					class="fa-regular fa-user me-2"></i><span class="sidebar-label">Users</span></a><a
+					class="nav-link menu-link p-2" th:href="@{/roles}"><i
+					class="fa-solid fa-user-shield me-2"></i><span
+					class="sidebar-label">Roles</span></a>
+			</div>
+		</div>
+	</nav>
+	<div class="mt-auto sidebar-footer">
+		<div class="sidebar-user-info px-2 pb-2">
+			<div class="fw-semibold text-truncate"
+				th:text="${currentUser != null ? currentUser.name : 'Guest user'}">Guest
+				user</div>
+			<small class="opacity-75 sidebar-label"
+				th:text="${currentUser != null && currentUser.role != null ? currentUser.role.name : 'Not signed in'}">Not
+				signed in</small>
+		</div>
+		<form th:if="${currentUser != null}" th:action="@{/logout}"
+			method="post" class="sidebar-logout-form">
+			<button type="submit"
+				class="btn btn-outline-light sidebar-logout-btn">
+				<i class="fa-solid fa-arrow-right-from-bracket me-2"></i><span
+					class="sidebar-label">Sign out</span>
+			</button>
+		</form>
+	</div>
+</div>

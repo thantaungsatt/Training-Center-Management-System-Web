@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/layout :: layout(~{::section})}">
+<body>
+	<section>
+		<header class="app-page-header">
+			<div>
+				<nav class="app-breadcrumb" aria-label="Breadcrumb">
+					<a th:href="@{/dashboard}">Dashboard</a><span class="mx-2">/</span><a th:href="@{/students}">Students</a><span class="mx-2">/</span><span th:text="${student.id == null ? 'Create student' : 'Edit student'}">Create student</span>
+				</nav>
+				<h1 class="app-page-title" th:text="${student.id == null ? 'Create student' : 'Edit student'}">Create student</h1>
+				<p class="app-page-subtitle">Add the student's contact details and profile information.</p>
+			</div>
+			<div class="app-actions"><a th:href="@{/students}" class="btn btn-app-secondary"><i class="fa-solid fa-arrow-left me-2"></i>Back to students</a></div>
+		</header>
+
+		<div class="row justify-content-center">
+			<div class="col-12 col-xl-9">
+				<div class="app-card">
+					<div th:if="${success}" class="alert alert-success" role="status" th:text="${success}"></div>
+					<div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+					<form th:action="@{/students/save}" th:object="${student}" method="post">
+						<input type="hidden" th:field="*{id}">
+						<div class="d-flex align-items-center gap-2 mb-4">
+							<span class="app-avatar"><i class="fa-solid fa-user-plus"></i></span>
+							<div><h2 class="h6 mb-1">Student details</h2><p class="small text-muted mb-0">Fields marked with an asterisk are required.</p></div>
+						</div>
+						<div class="row g-3">
+							<div class="col-12 col-md-6"><label for="name" class="form-label">Full name *</label><input id="name" type="text" th:field="*{name}" class="form-control" placeholder="Enter the student's full name" autocomplete="name" required></div>
+							<div class="col-12 col-md-6"><label for="fatherName" class="form-label">Father or guardian name *</label><input id="fatherName" type="text" th:field="*{fatherName}" class="form-control" placeholder="Enter father or guardian name" required></div>
+							<div class="col-12 col-md-6"><label for="dateOfBirth" class="form-label">Date of birth</label><input id="dateOfBirth" type="date" th:field="*{dateOfBirth}" class="form-control" autocomplete="bday"></div>
+							<div class="col-12 col-md-6"><label for="phoneNumber" class="form-label">Phone number *</label><input id="phoneNumber" type="tel" th:field="*{phoneNumber}" class="form-control" placeholder="Enter phone number" autocomplete="tel" required></div>
+							<div class="col-12 col-md-6"><label for="email" class="form-label">Email address</label><input id="email" type="email" th:field="*{email}" class="form-control" placeholder="name@example.com" autocomplete="email"></div>
+							<div class="col-12 col-md-6" th:if="${student.id == null}"><label for="status" class="form-label">Student status *</label><select id="status" th:field="*{status}" class="form-select" required><option value="">Select status</option><option th:each="status : ${statuses}" th:value="${status}" th:text="${status.label}">Active</option></select></div>
+							<input th:if="${student.id != null}" type="hidden" th:field="*{status}">
+							<div class="col-12"><label for="address" class="form-label">Address</label><textarea id="address" th:field="*{address}" class="form-control" placeholder="Enter the student's address" rows="3" autocomplete="street-address"></textarea></div>
+						</div>
+						<div class="d-flex flex-column-reverse flex-sm-row justify-content-end gap-2 mt-4 pt-3 border-top">
+							<a th:href="@{/students}" class="btn btn-app-secondary">Cancel</a>
+							<button type="submit" class="btn btn-app-primary"><i class="fa-solid fa-floppy-disk me-2"></i><span th:text="${student.id == null ? 'Create student' : 'Save changes'}">Create student</span></button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

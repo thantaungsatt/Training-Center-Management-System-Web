@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/layout :: layout(~{::section})}">
+
+<body>
+    <section>
+        <header class="app-page-header">
+            <div>
+                <nav class="app-breadcrumb" aria-label="Breadcrumb"><a th:href="@{/dashboard}">Dashboard</a><span class="mx-2">/</span><a th:href="@{/certificates}">Certificates</a><span class="mx-2">/</span><span th:text="${certificate.id == null ? 'Issue' : 'Edit'}">Issue</span></nav>
+                <h1 class="app-page-title" th:text="${certificate.id == null ? 'Issue a certificate' : 'Update certificate'}">Issue a certificate</h1>
+                <p class="app-page-subtitle">Choose the student and course, then confirm the certificate dates.</p>
+            </div>
+            <div class="app-actions"><a th:href="@{/certificates}" class="btn btn-app-secondary"><i class="fa-solid fa-arrow-left me-2"></i>Certificate list</a></div>
+        </header>
+
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <div class="app-card">
+                    <div class="d-flex align-items-start gap-3 mb-4"><span class="app-avatar"><i class="fa-solid fa-award"></i></span><div><h2 class="h6 mb-1">Certificate information</h2><p class="small text-muted mb-0">Student and course details are filled from the selected records.</p></div></div>
+                    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                    <form th:action="@{/certificates/save}" th:object="${certificate}" method="post">
+                        <input type="hidden" th:field="*{id}">
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Student</label>
+                                <select th:field="*{studentId}" id="studentId" class="form-select" required>
+                                    <option value="">Select student</option>
+                                    <option th:each="s : ${students}" th:value="${s.id}"
+                                        th:data-name="${s.name}"
+                                        th:data-father="${s.fatherName}"
+                                        th:data-dob="${s.dateOfBirth != null ? #temporals.format(s.dateOfBirth, 'yyyy-MM-dd') : ''}"
+                                        th:text="${s.name + ' (' + s.phoneNumber + ')'}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Student name</label>
+                                <input type="text" id="studentName" class="form-control" th:value="${certificate.studentName}" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Father name</label>
+                                <input type="text" id="fatherName" class="form-control" th:value="${certificate.fatherName}" readonly>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Date of birth</label>
+                                <input type="text" id="dob" class="form-control" th:value="${certificate.dateOfBirth != null ? #temporals.format(certificate.dateOfBirth, 'dd/MM/yyyy') : ''}" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Eligible course</label>
+                                <select th:field="*{courseId}" id="courseId" class="form-select" required>
+                                    <option value="">Select course</option>
+                                    <option th:each="enrollment : ${eligibleEnrollments}" th:value="${enrollment.courseId}"
+                                        th:attr="data-student-id=${enrollment.studentId},data-description=${eligibleCourses[enrollment.courseId] != null ? eligibleCourses[enrollment.courseId].description : ''},data-duration=${eligibleCourses[enrollment.courseId] != null ? eligibleCourses[enrollment.courseId].duration : ''}"
+                                        th:data-enroll="${enrollment.enrollDate != null ? #temporals.format(enrollment.enrollDate, 'yyyy-MM-dd') : ''}"
+                                        th:selected="${certificate.courseId != null && certificate.courseId == enrollment.courseId}"
+                                        th:text="${enrollment.courseName}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Certificate Serial No</label>
+                                <input type="text" th:field="*{certificateNo}" id="certificateNo" class="form-control"
+                                    placeholder="Auto generated by course" required>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Course Description</label>
+                                <textarea id="courseDescription" class="form-control" rows="2" readonly
+                                    th:text="${certificate.courseDescription}"></textarea>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Enroll Date (Start)</label>
+                                <input type="date" id="enrollDate" lang="en-GB" th:field="*{enrollDate}" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">End Date</label>
+                                <input type="date" id="endDate" lang="en-GB" th:field="*{endDate}" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Issue Date</label>
+                                <input type="date" id="issueDate" lang="en-GB" th:field="*{issueDate}" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+                            <a th:href="@{/certificates}" class="btn btn-app-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-app-primary">
+                                <i class="fas fa-save me-2"></i>
+                                <span th:text="${certificate.id == null ? 'Save Certificate' : 'Update Certificate'}"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const studentSelect = document.getElementById("studentId");
+            const courseSelect = document.getElementById("courseId");
+            const studentNameInput = document.getElementById("studentName");
+            const fatherNameInput = document.getElementById("fatherName");
+            const dobInput = document.getElementById("dob");
+            const courseDescInput = document.getElementById("courseDescription");
+            const serialInput = document.getElementById("certificateNo");
+            const enrollDateInput = document.getElementById("enrollDate");
+            const endDateInput = document.getElementById("endDate");
+            const issueDateInput = document.getElementById("issueDate");
+
+            function isoToDisplay(value) {
+                if (!value) return "";
+                const [year, month, day] = value.split("-");
+                return `${day}/${month}/${year}`;
+            }
+
+            function todayIso() {
+                const today = new Date();
+                const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
+                return localDate.toISOString().slice(0, 10);
+            }
+
+            function calculateEndDate(startDate, duration) {
+                const match = (duration || "").match(/(\d+)\s*(day|week|month|year)s?\b/i);
+                if (!startDate || !match) return "";
+                const [year, month, day] = startDate.split("-").map(Number);
+                const date = new Date(year, month - 1, day);
+                const amount = Number(match[1]);
+                const unit = match[2].toLowerCase();
+                if (unit === "day") date.setDate(date.getDate() + amount);
+                if (unit === "week") date.setDate(date.getDate() + amount * 7);
+                if (unit === "month" || unit === "year") {
+                    const targetMonth = date.getMonth() + amount * (unit === "year" ? 12 : 1);
+                    const targetYear = date.getFullYear() + Math.floor(targetMonth / 12);
+                    const normalizedMonth = ((targetMonth % 12) + 12) % 12;
+                    const lastDay = new Date(targetYear, normalizedMonth + 1, 0).getDate();
+                    date.setFullYear(targetYear, normalizedMonth, Math.min(day, lastDay));
+                }
+                const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                return localDate.toISOString().slice(0, 10);
+            }
+
+            function fillStudentDetails() {
+                const option = studentSelect.options[studentSelect.selectedIndex];
+                studentNameInput.value = option?.dataset?.name || "";
+                fatherNameInput.value = option?.dataset?.father || "";
+                dobInput.value = isoToDisplay(option?.dataset?.dob || "");
+                const studentId = studentSelect.value;
+                Array.from(courseSelect.options).forEach(courseOption => {
+                    courseOption.hidden = Boolean(courseOption.value) && courseOption.dataset.studentId !== studentId;
+                });
+                if (courseSelect.selectedOptions[0]?.dataset?.studentId !== studentId) {
+                    courseSelect.value = "";
+                    clearCourseDetails();
+                }
+            }
+
+            function clearCourseDetails() {
+                courseDescInput.value = "";
+                serialInput.value = "";
+                enrollDateInput.value = "";
+                endDateInput.value = "";
+            }
+
+            async function fillCourseDetailsAndSerial(courseChanged = false) {
+                const option = courseSelect.options[courseSelect.selectedIndex];
+                if (!option?.value) {
+                    clearCourseDetails();
+                    return;
+                }
+                courseDescInput.value = option.dataset.description || "";
+                const enrollmentDate = option.dataset.enroll || "";
+                if (courseChanged || !enrollDateInput.value) enrollDateInput.value = enrollmentDate;
+                if (courseChanged || !endDateInput.value) {
+                    endDateInput.value = calculateEndDate(enrollmentDate, option.dataset.duration);
+                }
+                if (!issueDateInput.value || courseChanged) issueDateInput.value = todayIso();
+
+                const shouldGenerateSerial = courseChanged || !serialInput.value;
+                if (!shouldGenerateSerial) return;
+                serialInput.value = "";
+                try {
+                    const response = await fetch(`/certificates/serial?courseId=${encodeURIComponent(option.value)}`);
+                    if (!response.ok) return;
+                    const data = await response.json();
+                    if (courseSelect.value === option.value) serialInput.value = data?.serial || "";
+                } catch (error) {
+                    serialInput.value = "";
+                }
+            }
+
+            studentSelect.addEventListener("change", () => {
+                fillStudentDetails();
+                fillCourseDetailsAndSerial(true);
+            });
+            courseSelect.addEventListener("change", () => fillCourseDetailsAndSerial(true));
+            fillStudentDetails();
+            fillCourseDetailsAndSerial(false);
+        </script>
+
+    </section>
+</body>
+
+</html>
+

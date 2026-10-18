@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<!-- Reference listing view: uses layouts/layout and only reusable SaaS utility classes. -->
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layouts/layout :: layout(~{::section})}">
+<body>
+	<section>
+		<div class="app-page-header">
+			<div>
+				<nav class="app-breadcrumb" aria-label="Breadcrumb">
+					<a th:href="@{/dashboard}">Dashboard</a><span class="mx-2">/</span><span>Students</span>
+				</nav>
+				<h1 class="app-page-title">Student management</h1>
+				<p class="app-page-subtitle">Review student profiles, class
+					assignments, and current status.</p>
+			</div>
+			<div class="app-actions d-flex flex-wrap gap-2">
+				<a th:href="@{/enrollments/enroll}" class="btn btn-app-primary"><i
+					class="fa-solid fa-clipboard-check me-2"></i>New enrollment</a>
+			</div>
+		</div>
+
+		<div class="app-filter-card mb-4">
+			<form th:action="@{/students}" method="get"
+				class="row g-3 align-items-end">
+				<input type="hidden" name="view" th:value="${view}">
+				<div class="col-12 col-md-6 col-xl-4">
+					<label for="keyword" class="form-label">Search students</label>
+					<div class="position-relative">
+						<i
+							class="fa-solid fa-magnifying-glass position-absolute top-50 translate-middle-y ms-3 text-muted"></i><input
+							id="keyword" name="keyword" type="search"
+							class="form-control ps-5" placeholder="Name, phone, or email"
+							th:value="${keyword}">
+					</div>
+				</div>
+				<div class="col-12 col-md-6 col-xl-3">
+					<label for="courseId" class="form-label">Course</label><select
+						id="courseId" name="courseId" class="form-select"><option
+							value="">All courses</option>
+						<option th:each="course : ${courseOptions}"
+							th:value="${course.id}" th:selected="${courseId == course.id}"
+							th:text="${course.courseName}"></option></select>
+				</div>
+				<div class="col-12 col-md-6 col-xl-3">
+					<label for="classTimeId" class="form-label">Class time</label><select
+						id="classTimeId" name="classTimeId" class="form-select"><option
+							value="">All class times</option>
+						<option th:each="c : ${classTimeOptions}" th:value="${c.id}"
+							th:selected="${classTimeId == c.id}"
+							th:text="${(c.startTime != null ? #temporals.format(c.startTime, 'h a') : '--:--') + ' - ' + (c.endTime != null ? #temporals.format(c.endTime, 'h a') : '--:--')}"></option></select>
+				</div>
+				<div class="col-12 col-md-6 col-xl-2 d-flex gap-2">
+					<button type="submit" class="btn btn-app-primary flex-grow-1">
+						<i class="fa-solid fa-filter me-2"></i>Filter
+					</button>
+					<a th:href="@{/students(view=${view})}" class="btn btn-app-secondary"
+						title="Clear filters"><i class="fa-solid fa-rotate-left"></i></a>
+				</div>
+			</form>
+		</div>
+
+		<div class="app-table-card">
+			<div
+				class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 p-3 p-md-4 border-bottom">
+				<div>
+					<h2 class="h6 mb-1">Student directory</h2>
+					<p class="text-muted small mb-0"
+						th:text="${totalItems} + ' enrollment records found'">0
+						enrollment records found</p>
+				</div>
+				<div class="directory-toolbar d-flex flex-wrap align-items-center gap-2">
+					<div class="btn-group student-view-switch" role="group" aria-label="Student list type">
+						<a th:href="@{/students(view='active',keyword=${keyword},courseId=${courseId},classTimeId=${classTimeId})}"
+							class="btn btn-sm" th:classappend="${view == 'active'} ? ' btn-app-primary' : ' btn-app-secondary'">Active</a>
+						<a th:href="@{/students(view='certificated',keyword=${keyword},courseId=${courseId},classTimeId=${classTimeId})}"
+							class="btn btn-sm" th:classappend="${view == 'certificated'} ? ' btn-app-primary' : ' btn-app-secondary'">Certificated</a>
+					</div>
+				<span class="status-pill status-active"><i
+					class="fa-solid fa-circle-check me-1"></i>Live data</span>
+				</div>
+			</div>
+			<div class="table-responsive">
+				<table class="table app-table align-middle">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Student</th>
+							<th>Parent / guardian</th>
+							<th>Phone</th>
+							<th>Class</th>
+							<th>Status</th>
+							<th class="text-end">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${#lists.isEmpty(enrollments)}">
+							<td colspan="7" class="text-center py-5 text-muted"><i
+								class="fa-regular fa-folder-open fa-lg d-block mb-2"></i>No
+								students match the selected filters.</td>
+						</tr>
+						<tr th:each="e, stat : ${enrollments}">
+							<td class="text-muted"
+								th:text="${(currentPage * pageSize) + stat.count}">1</td>
+							<td><div class="d-flex align-items-center gap-2">
+									<span class="app-avatar"
+										th:text="${#strings.substring(e.studentName, 0, 1)}">S</span>
+									<div>
+										<a class="fw-semibold text-decoration-none text-dark"
+											th:href="@{/students/details/{id}(id=${e.studentId})}"
+											th:text="${e.studentName}">Student name</a>
+										<div class="small text-muted">Student record</div>
+									</div>
+								</div></td>
+							<td th:text="${e.fatherName}">Guardian name</td>
+							<td class="text-nowrap" th:text="${e.phoneNumber}">09...</td>
+							<td th:text="${e.className}">Class</td>
+							<td><span th:if="${e.certificated}"
+								class="status-pill status-completed">Certificated</span><span
+								th:if="${!e.certificated and e.studentStatus != null}"
+								class="status-pill"
+								th:classappend="${e.studentStatus.name() == 'ACTIVE'} ? ' status-active' : ' status-inactive'"
+								th:text="${e.studentStatus.label}">Active</span><span
+								th:if="${!e.certificated and e.studentStatus == null}"
+								class="status-pill status-inactive">Unknown</span></td>
+							<td class="text-end"><div class="dropdown action-menu">
+									<button class="btn btn-sm btn-light" type="button"
+										data-bs-toggle="dropdown" aria-expanded="false"
+										aria-label="Student actions">
+										<i class="fa-solid fa-ellipsis"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li><a class="dropdown-item"
+											th:href="@{/students/details/{id}(id=${e.studentId})}"><i
+												class="fa-regular fa-eye me-2 text-primary"></i>View details</a></li>
+										<li><a class="dropdown-item"
+											th:href="@{/students/edit/{id}(id=${e.studentId})}"><i
+												class="fa-regular fa-pen-to-square me-2 text-warning"></i>Edit
+												student</a></li>
+										<li><a class="dropdown-item"
+											th:href="@{/enrollments/change-time/{id}(id=${e.id})}"><i
+												class="fa-regular fa-clock me-2 text-info"></i>Change class
+												time</a></li>
+									</ul>
+								</div></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div th:replace="~{layouts/fragments/pagination :: pager('/students', ${currentPage}, ${totalPages}, ${hasPrevious}, ${hasNext}, ${keyword}, ${courseId}, ${classTimeId}, null, null, null, null)}"></div>
+		</div>
+	</section>
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/layout :: layout(~{::section})}">
+
+<body>
+    <section>
+        <div class="wizard-shell">
+            <div class="wizard-top mb-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center">
+                    <div>
+                        <h3 class="mb-1 fw-bold">Student Enrollment</h3>
+                        <p class="mb-0 text-white-50">Complete student profile, class enrollment, and payment in 3
+                            steps.</p>
+                    </div>
+                    <div class="text-md-end">
+                        <small class="text-white-50">Current Step</small>
+                        <div class="fs-5 fw-bold" th:text="${'Step ' + currentStep + ' of 3'}"></div>
+                    </div>
+                </div>
+                <div class="wizard-steps">
+                    <div class="wizard-step" th:classappend="${currentStep == 1} ? ' active'">1. Student</div>
+                    <div class="wizard-step" th:classappend="${currentStep == 2} ? ' active'">2. Enrollment</div>
+                    <div class="wizard-step" th:classappend="${currentStep == 3} ? ' active'">3. Payment</div>
+                </div>
+                <div class="progress wizard-progress mt-3">
+                    <div class="progress-bar" role="progressbar"
+                        th:style="${'width:' + (currentStep == 1 ? 33 : (currentStep == 2 ? 66 : 100)) + '%'}"></div>
+                </div>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger d-flex align-items-start gap-2" role="alert"><i class="fa-solid fa-circle-exclamation mt-1"></i><span th:text="${error}">Please review the highlighted fields.</span></div>
+
+            <div class="app-card wizard-card p-4">
+                <form th:if="${currentStep == 1}" th:action="@{/enrollments/enroll/step1/next}" th:object="${wizardForm}"
+                    method="post">
+                    <h5 class="fw-bold mb-3">Step 1: Student Information</h5>
+                    <div class="alert alert-info mb-3">
+                        Returning student? Enable this option to skip profile registration and enroll directly into a
+                        new class with payment.
+                    </div>
+                    <div class="row g-3 mb-2">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mt-1">
+                                <input class="form-check-input" type="checkbox" th:field="*{returningStudent}"
+                                    id="returningStudentToggle">
+                                <label class="form-check-label fw-semibold" for="returningStudentToggle">Returning
+                                    Student</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-12" id="existingStudentSection"
+                            th:classappend="${!wizardForm.returningStudent} ? ' d-none'">
+                            <label class="form-label fw-semibold">Select Existing Student</label>
+                            <select th:field="*{existingStudentId}" class="form-select"
+                                th:classappend="${#fields.hasErrors('existingStudentId')} ? ' is-invalid'">
+                                <option value="">Select student</option>
+                                <option th:each="student : ${studentOptions}" th:value="${student.id}"
+                                    th:text="${student.label}"></option>
+                            </select>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('existingStudentId')}"
+                                th:errors="*{existingStudentId}"></div>
+                        </div>
+                        <div class="col-md-6 new-student-section"
+                            th:classappend="${wizardForm.returningStudent} ? ' d-none'">
+                            <label class="form-label fw-semibold">Student Name</label>
+                            <input type="text" th:field="*{name}" class="form-control"
+                                th:classappend="${#fields.hasErrors('name')} ? ' is-invalid'"
+                                placeholder="Enter full name">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 new-student-section"
+                            th:classappend="${wizardForm.returningStudent} ? ' d-none'">
+                            <label class="form-label fw-semibold">Father Name</label>
+                            <input type="text" th:field="*{fatherName}" class="form-control"
+                                th:classappend="${#fields.hasErrors('fatherName')} ? ' is-invalid'"
+                                placeholder="Enter father name">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('fatherName')}"
+                                th:errors="*{fatherName}"></div>
+                        </div>
+                        <div class="col-md-6 new-student-section"
+                            th:classappend="${wizardForm.returningStudent} ? ' d-none'">
+                            <label class="form-label fw-semibold">Date of Birth</label>
+                            <input type="date" th:field="*{dateOfBirth}" class="form-control">
+                        </div>
+                        <div class="col-md-6 new-student-section"
+                            th:classappend="${wizardForm.returningStudent} ? ' d-none'">
+                            <label class="form-label fw-semibold">Phone Number</label>
+                            <input type="text" th:field="*{phoneNumber}" class="form-control"
+                                th:classappend="${#fields.hasErrors('phoneNumber')} ? ' is-invalid'"
+                                placeholder="Enter phone number">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('phoneNumber')}"
+                                th:errors="*{phoneNumber}"></div>
+                        </div>
+                        <div class="col-md-6 new-student-section"
+                            th:classappend="${wizardForm.returningStudent} ? ' d-none'">
+                            <label class="form-label fw-semibold">Email</label>
+                            <input type="email" th:field="*{email}" class="form-control"
+                                placeholder="Enter email">
+                        </div>
+                        <div class="col-md-6 new-student-section"
+                            th:classappend="${wizardForm.returningStudent} ? ' d-none'">
+                            <label class="form-label fw-semibold">Student Status</label>
+                            <select th:field="*{studentStatus}" class="form-select">
+                                <option th:each="status : ${studentStatuses}" th:value="${status}"
+                                    th:text="${status.label}"></option>
+                            </select>
+                        </div>
+                        <div class="col-12 new-student-section"
+                            th:classappend="${wizardForm.returningStudent} ? ' d-none'">
+                            <label class="form-label fw-semibold">Address</label>
+                            <textarea th:field="*{address}" class="form-control" rows="3"
+                                placeholder="Enter address"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+                        <a th:href="@{/enrollments/enroll/cancel}" class="btn btn-app-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-app-primary">Next: Enrollment</button>
+                    </div>
+                </form>
+
+                <form th:if="${currentStep == 2}" th:action="@{/enrollments/enroll/step2/next}" th:object="${wizardForm}"
+                    method="post">
+                    <h5 class="fw-bold mb-3">Step 2: Enrollment Details</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="selectedCourseId" class="form-label fw-semibold">Course</label>
+                            <select th:field="*{selectedCourseId}" id="selectedCourseId" class="form-select"
+                                th:classappend="${#fields.hasErrors('selectedCourseId')} ? ' is-invalid'">
+                                <option value="">Select course</option>
+                                <option th:each="course : ${courseOptions}" th:value="${course.courseId}"
+                                    th:text="${course.courseName}"></option>
+                            </select>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('selectedCourseId')}"
+                                th:errors="*{selectedCourseId}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="selectedScheduleType" class="form-label fw-semibold">Schedule</label>
+                            <select th:field="*{selectedScheduleType}" id="selectedScheduleType" class="form-select"
+                                th:classappend="${#fields.hasErrors('selectedScheduleType')} ? ' is-invalid'">
+                                <option value="">Select weekday or weekend</option>
+                                <option th:each="schedule : ${scheduleTypes}" th:value="${schedule}"
+                                    th:text="${schedule.label}"></option>
+                            </select>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('selectedScheduleType')}"
+                                th:errors="*{selectedScheduleType}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="trainingClassId" class="form-label fw-semibold">Class time</label>
+                            <select th:field="*{trainingClassId}" id="trainingClassId" class="form-select"
+                                th:classappend="${#fields.hasErrors('trainingClassId')} ? ' is-invalid'">
+                                <option value="">Select class time</option>
+                                <option th:each="classItem : ${classOptions}" th:value="${classItem.id}"
+                                    th:attr="data-course-id=${classItem.courseId},data-schedule=${classItem.scheduleType}"
+                                    th:text="${classItem.timeLabel}"></option>
+                            </select>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('trainingClassId')}"
+                                th:errors="*{trainingClassId}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Enroll Date</label>
+                            <input type="date" lang="en-GB" th:field="*{enrollDate}" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Enrollment Status</label>
+                            <select th:field="*{enrollmentStatus}" class="form-select">
+                                <option th:each="status : ${enrollmentStatuses}" th:value="${status}"
+                                    th:text="${status.label}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+                        <button type="submit" th:formaction="@{/enrollments/enroll/step2/back}" formmethod="post"
+                            class="btn btn-app-secondary">Back</button>
+                        <button type="submit" class="btn btn-app-primary">Next: Payment</button>
+                    </div>
+                </form>
+
+                <form th:if="${currentStep == 3}" id="wizardConfirmForm" th:action="@{/enrollments/enroll/confirm}" th:object="${wizardForm}"
+                    method="post">
+                    <h5 class="fw-bold mb-3">Step 3: Payment & Confirmation</h5>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-lg-6">
+                            <div class="app-card h-100">
+                                <div class="card-body">
+                                    <h6 class="fw-bold mb-3">Student Preview</h6>
+                                    <dl class="row mb-0 preview-list">
+                                        <dt class="col-5">Name</dt>
+                                        <dd class="col-7" th:text="*{name}"></dd>
+                                        <dt class="col-5">Father</dt>
+                                        <dd class="col-7" th:text="*{fatherName}"></dd>
+                                        <dt class="col-5">Phone</dt>
+                                        <dd class="col-7" th:text="*{phoneNumber}"></dd>
+                                        <dt class="col-5">Email</dt>
+                                        <dd class="col-7" th:text="*{email}"></dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="app-card h-100">
+                                <div class="card-body">
+                                    <h6 class="fw-bold mb-3">Enrollment Preview</h6>
+                                    <dl class="row mb-0 preview-list">
+                                        <dt class="col-5">Class</dt>
+                                        <dd class="col-7">
+                                            <span th:each="classItem : ${classOptions}"
+                                                th:if="${classItem.id == wizardForm.trainingClassId}"
+                                                th:text="${classItem.summaryLabel}"></span>
+                                        </dd>
+                                        <dt class="col-5">Enroll Date</dt>
+                                        <dd class="col-7" th:text="${wizardForm.enrollDate != null ? #temporals.format(wizardForm.enrollDate, 'dd/MM/yyyy') : ''}"></dd>
+                                        <dt class="col-5">Course Fee</dt>
+                                        <dd class="col-7"
+                                            th:text="${#numbers.formatDecimal(courseFee, 1, 'COMMA', 2, 'POINT')}"></dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Discount</label>
+                            <div class="input-group">
+                                <input type="number" step="0.01" min="0" max="100" th:field="*{discountPercent}"
+                                    id="wizardDiscountInput" class="form-control"
+                                    th:classappend="${#fields.hasErrors('discountPercent')} ? ' is-invalid'"
+                                    placeholder="Enter discount percent">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('discountPercent')}"
+                                th:errors="*{discountPercent}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="wizardAmountInput">Paid Amount</label>
+                            <input type="number" step="0.01" min="0" th:field="*{amount}" id="wizardAmountInput"
+                                class="form-control"
+                                th:classappend="${#fields.hasErrors('amount') or amountValidationError == true} ? ' is-invalid'"
+                                placeholder="Enter paid amount">
+                            <div class="form-text">Enter an amount greater than 0 to confirm enrollment.</div>
+                            <div id="wizardAmountError" class="invalid-feedback d-none" th:classappend="${amountValidationError == true} ? ' d-block'">Paid amount must be greater than 0.</div>
+                            <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Payment Date</label>
+                            <input type="date" lang="en-GB" th:field="*{paymentDate}" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Payment Type</label>
+                            <select th:field="*{paymentType}" class="form-select">
+                                <option th:each="type : ${paymentTypes}" th:value="${type}" th:text="${type.label}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Payment Status</label>
+                            <input type="text" id="wizardPaymentStatusLabel" class="form-control"
+                                value="PARTIAL" readonly>
+                            <input type="hidden" th:field="*{paymentStatus}" id="wizardPaymentStatusInput">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Note</label>
+                            <textarea th:field="*{note}" rows="3" class="form-control"
+                                placeholder="Optional note"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="app-filter-card mt-4">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3">Payment Preview</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="small text-muted">Amount To Pay (After Discount)</div>
+                                    <div class="fw-bold" id="wizardTotalFeeText"
+                                        th:attr="data-actual-fee=${courseFee}"
+                                        th:text="${#numbers.formatDecimal(discountedCourseFee, 1, 'COMMA', 2, 'POINT')}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="small text-muted">Paid Now</div>
+                                    <div class="fw-bold" id="wizardPaidNowText"
+                                        th:text="${#numbers.formatDecimal(wizardForm.amount ?: 0, 1, 'COMMA', 2, 'POINT')}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="small text-muted">Remaining</div>
+                                    <div class="fw-bold text-danger" id="wizardRemainingText"
+                                        th:text="${#numbers.formatDecimal(remainingAmount, 1, 'COMMA', 2, 'POINT')}">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="small text-muted">Enrollment Preview keeps original fee; payment status
+                                        is auto-calculated from discounted payable amount and paid amount.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+                        <a th:href="@{/enrollments/enroll/cancel}" class="btn btn-app-secondary px-4 py-2">Cancel</a>
+                        <button type="submit" th:formaction="@{/enrollments/enroll/step3/back}" formmethod="post"
+                            class="btn btn-app-secondary px-4 py-2">Back</button>
+                        <button type="submit" class="btn btn-app-primary px-4 py-2">Confirm Enrollment</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const courseSelect = document.getElementById("selectedCourseId");
+                const scheduleSelect = document.getElementById("selectedScheduleType");
+                const classSelect = document.getElementById("trainingClassId");
+                if (!courseSelect || !scheduleSelect || !classSelect) return;
+
+                const refreshSchedules = reset => {
+                    if (reset) scheduleSelect.value = "";
+                    const available = new Set(Array.from(classSelect.options)
+                        .filter(option => option.dataset.courseId === courseSelect.value)
+                        .map(option => option.dataset.schedule));
+                    Array.from(scheduleSelect.options).forEach(option => {
+                        option.hidden = Boolean(option.value) && !available.has(option.value);
+                    });
+                    refreshClasses(reset);
+                };
+                const refreshClasses = reset => {
+                    if (reset) classSelect.value = "";
+                    Array.from(classSelect.options).forEach(option => {
+                        option.hidden = Boolean(option.value) && (option.dataset.courseId !== courseSelect.value
+                            || option.dataset.schedule !== scheduleSelect.value);
+                    });
+                };
+                courseSelect.addEventListener("change", () => refreshSchedules(true));
+                scheduleSelect.addEventListener("change", () => refreshClasses(true));
+                refreshSchedules(false);
+            });
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const toggle = document.getElementById("returningStudentToggle");
+                const existingStudentSection = document.getElementById("existingStudentSection");
+                const newStudentSections = document.querySelectorAll(".new-student-section");
+
+                if (!toggle || !existingStudentSection) {
+                    return;
+                }
+
+                const applyStudentMode = () => {
+                    const isReturning = toggle.checked;
+                    existingStudentSection.classList.toggle("d-none", !isReturning);
+                    newStudentSections.forEach(section => section.classList.toggle("d-none", isReturning));
+                };
+
+                toggle.addEventListener("change", applyStudentMode);
+                applyStudentMode();
+            });
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const amountInput = document.getElementById("wizardAmountInput");
+                const discountInput = document.getElementById("wizardDiscountInput");
+                const totalFeeText = document.getElementById("wizardTotalFeeText");
+                const paidNowText = document.getElementById("wizardPaidNowText");
+                const remainingText = document.getElementById("wizardRemainingText");
+                const paymentStatusLabel = document.getElementById("wizardPaymentStatusLabel");
+                const paymentStatusInput = document.getElementById("wizardPaymentStatusInput");
+                const confirmForm = document.getElementById("wizardConfirmForm");
+                const amountError = document.getElementById("wizardAmountError");
+
+                const toNumber = (value) => {
+                    const parsed = Number(String(value || "").replace(/,/g, ""));
+                    return Number.isFinite(parsed) ? parsed : 0;
+                };
+
+                const formatMoney = (value) => value.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+                const readActualFee = () => {
+                    if (totalFeeText) {
+                        return toNumber(totalFeeText.dataset.actualFee);
+                    }
+                    return 0;
+                };
+
+                const normalizedDiscount = () => {
+                    const raw = discountInput ? toNumber(discountInput.value) : 0;
+                    return Math.max(0, Math.min(100, raw));
+                };
+
+                const updatePaymentPreview = () => {
+                    if (!amountInput || !remainingText || !paymentStatusLabel || !paymentStatusInput) {
+                        return;
+                    }
+                    const actualFee = readActualFee();
+                    const discountPercent = normalizedDiscount();
+                    const fee = Math.max(0, actualFee * (1 - (discountPercent / 100)));
+                    const paid = Math.max(0, toNumber(amountInput.value));
+                    const remaining = Math.max(0, fee - paid);
+                    const status = remaining <= 0 ? "PAID" : "PARTIAL";
+
+                    if (totalFeeText) {
+                        totalFeeText.textContent = formatMoney(fee);
+                    }
+                    if (paidNowText) {
+                        paidNowText.textContent = formatMoney(paid);
+                    }
+                    remainingText.textContent = formatMoney(remaining);
+                    paymentStatusLabel.value = status;
+                    paymentStatusInput.value = status;
+                };
+
+                if (amountInput) {
+                    amountInput.addEventListener("input", updatePaymentPreview);
+                    amountInput.addEventListener("input", function () {
+                        if (toNumber(amountInput.value) > 0) {
+                            amountInput.classList.remove("is-invalid");
+                            amountError?.classList.remove("d-block");
+                            amountError?.classList.add("d-none");
+                        }
+                    });
+                }
+                if (discountInput) {
+                    discountInput.addEventListener("input", updatePaymentPreview);
+                }
+                confirmForm?.addEventListener("submit", function (event) {
+                    if (!amountInput || toNumber(amountInput.value) > 0) {
+                        return;
+                    }
+                    event.preventDefault();
+                    amountInput.classList.add("is-invalid");
+                    amountError?.classList.remove("d-none");
+                    amountError?.classList.add("d-block");
+                    amountInput.focus();
+                });
+                updatePaymentPreview();
+            });
+        </script>
+
+    </section>
+</body>
+
+</html>

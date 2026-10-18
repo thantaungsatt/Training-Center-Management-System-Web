@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layouts/layout :: layout(~{::section})}">
+<body>
+	<section>
+		<header class="app-page-header">
+			<div>
+				<nav class="app-breadcrumb" aria-label="Breadcrumb">
+					<a th:href="@{/dashboard}">Dashboard</a><span class="mx-2">/</span><a
+						th:href="@{/students}">Students</a><span class="mx-2">/</span><span>Student
+						profile</span>
+				</nav>
+				<h1 class="app-page-title" th:text="${student.name}">Student
+					details</h1>
+				<p class="app-page-subtitle">Student profile, enrollment
+					history, and payment records.</p>
+			</div>
+			<div class="app-actions d-flex flex-wrap gap-2">
+				<a th:href="@{/students}" class="btn btn-app-secondary"><i
+					class="fa-solid fa-arrow-left me-2"></i>Students</a> 
+				<div class="dropdown action-menu">
+					<button class="btn btn-app-secondary dropdown-toggle" type="button"
+						data-bs-toggle="dropdown" aria-expanded="false">
+						<i class="fa-solid fa-user-gear me-2"></i>Status
+					</button>
+					<ul class="dropdown-menu dropdown-menu-end">
+						<li><form
+								th:action="@{/students/status/{id}(id=${student.id})}"
+								method="post">
+								<input type="hidden" name="status" value="ACTIVE">
+								<button type="submit" class="dropdown-item">
+									<i class="fa-solid fa-circle-check me-2 text-success"></i>Active
+								</button>
+							</form></li>
+						<li><form
+								th:action="@{/students/status/{id}(id=${student.id})}"
+								method="post">
+								<input type="hidden" name="status" value="INACTIVE">
+								<button type="submit" class="dropdown-item">
+									<i class="fa-solid fa-user-slash me-2 text-secondary"></i>Inactive
+								</button>
+							</form></li>
+						<li><form
+								th:action="@{/students/status/{id}(id=${student.id})}"
+								method="post">
+								<input type="hidden" name="status" value="ABSENCE">
+								<button type="submit" class="dropdown-item">
+									<i class="fa-solid fa-user-clock me-2 text-warning"></i>Absence
+								</button>
+							</form></li>
+						<li><form
+								th:action="@{/students/status/{id}(id=${student.id})}"
+								method="post">
+								<input type="hidden" name="status" value="SUSPENDED">
+								<button type="submit" class="dropdown-item text-danger">
+									<i class="fa-solid fa-ban me-2"></i>Suspended
+								</button>
+							</form></li>
+					</ul>
+				</div>
+			</div>
+		</header>
+		<div th:if="${success}" class="alert alert-success" role="status"
+			th:text="${success}"></div>
+		<div th:if="${error}" class="alert alert-danger" role="alert"
+			th:text="${error}"></div>
+		<div class="app-card mb-4">
+			<div
+				class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 mb-4">
+				<span class="app-avatar"
+					style="width: 52px; height: 52px; font-size: 1.1rem"
+					th:text="${#strings.isEmpty(student.name) ? 'S' : #strings.substring(student.name, 0, 1)}">S</span>
+				<div class="flex-grow-1">
+					<h2 class="h5 mb-1" th:text="${student.name}">Student name</h2>
+					<div class="text-muted small"
+						th:text="${student.email != null && !#strings.isEmpty(student.email) ? student.email : student.phoneNumber}">Contact
+						details</div>
+				</div>
+				<span class="status-pill"
+					th:classappend="${student.status != null && student.status.name() == 'ACTIVE'} ? ' status-active' : ' status-inactive'"
+					th:text="${student.status != null ? student.status.label : 'Unknown'}">Status</span>
+			</div>
+			<div class="row g-3">
+				<div class="col-12 col-md-6 col-xl-3">
+					<div class="small text-muted mb-1">Father or guardian</div>
+					<div class="fw-semibold" th:text="${student.fatherName} ?: '-'"></div>
+				</div>
+				<div class="col-12 col-md-6 col-xl-3">
+					<div class="small text-muted mb-1">Phone</div>
+					<div class="fw-semibold" th:text="${student.phoneNumber} ?: '-'"></div>
+				</div>
+				<div class="col-12 col-md-6 col-xl-3">
+					<div class="small text-muted mb-1">Date of birth</div>
+					<div class="fw-semibold"
+						th:text="${student.dateOfBirth != null ? #temporals.format(student.dateOfBirth, 'dd MMM yyyy') : '-'}">-</div>
+				</div>
+				<div class="col-12 col-md-6 col-xl-3">
+					<div class="small text-muted mb-1">Address</div>
+					<div class="fw-semibold" th:text="${student.address} ?: '-'"></div>
+				</div>
+			</div>
+		</div>
+		<div class="row g-4">
+			<div class="col-12 col-xl-6">
+				<div class="app-table-card h-100">
+					<div
+						class="d-flex justify-content-between align-items-center p-3 p-md-4 border-bottom">
+						<div>
+							<h2 class="h6 mb-1">Enrollment history</h2>
+							<p class="small text-muted mb-0">Classes assigned to this
+								student</p>
+						</div>
+						<span class="status-pill status-completed"
+							th:text="${#lists.size(enrollments)} + ' records'">0
+							records</span>
+					</div>
+					<div class="table-responsive">
+						<table class="table app-table align-middle">
+							<thead>
+								<tr>
+									<th>Class</th>
+									<th>Payment status</th>
+									<th>Enrollment date</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:if="${#lists.isEmpty(enrollments)}">
+									<td colspan="3" class="text-center py-5 text-muted"><i
+										class="fa-regular fa-folder-open fa-lg d-block mb-2"></i>No
+										enrollment records.</td>
+								</tr>
+								<tr th:each="e : ${enrollments}">
+									<td class="fw-semibold" th:text="${e.className}">Class</td>
+									<td><span class="status-pill"
+										th:classappend="${e.paymentStatus == 'Paid' ? ' status-paid' : (e.paymentStatus == 'Partial' ? ' status-partial' : ' status-inactive')}"
+										th:text="${e.paymentStatus != null ? e.paymentStatus : '-'}"></span></td>
+									<td class="text-nowrap"
+										th:text="${e.enrollDate != null ? #temporals.format(e.enrollDate, 'dd MMM yyyy') : '-'}">-</td>
+									
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="col-12 col-xl-6">
+				<div class="app-table-card h-100">
+					<div
+						class="d-flex justify-content-between align-items-center p-3 p-md-4 border-bottom">
+						<div>
+							<h2 class="h6 mb-1">Payment history</h2>
+							<p class="small text-muted mb-0">Recorded payments for this
+								student</p>
+						</div>
+						<span class="status-pill status-active"
+							th:text="${#lists.size(payments)} + ' records'">0 records</span>
+					</div>
+					<div class="table-responsive">
+						<table class="table app-table align-middle">
+							<thead>
+								<tr>
+									<th>Class</th>
+									<th>Amount</th>
+									<th>Date</th>
+									<th>Note</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:if="${#lists.isEmpty(payments)}">
+									<td colspan="4" class="text-center py-5 text-muted"><i
+										class="fa-regular fa-folder-open fa-lg d-block mb-2"></i>No
+										payment records.</td>
+								</tr>
+								<tr th:each="p : ${payments}">
+									<td class="fw-semibold" th:text="${p.className}">Class</td>
+									<td class="text-nowrap"
+										th:text="${p.amount != null ? #numbers.formatDecimal(p.amount, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+									<td class="text-nowrap"
+										th:text="${p.paymentDate != null ? #temporals.format(p.paymentDate, 'dd MMM yyyy') : '-'}">-</td>
+									<td
+										th:text="${p.note != null && !#strings.isEmpty(p.note) ? p.note : '-'}">-</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

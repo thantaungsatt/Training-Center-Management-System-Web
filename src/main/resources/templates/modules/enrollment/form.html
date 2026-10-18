@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/layout :: layout(~{::section})}">
+
+<body>
+    <section>
+        <header class="app-page-header">
+            <div>
+                <nav class="app-breadcrumb" aria-label="Breadcrumb"><a th:href="@{/dashboard}">Dashboard</a><span class="mx-2">/</span><a th:href="@{/enrollments}">Enrollments</a><span class="mx-2">/</span><span th:text="${enrollment.id == null ? 'New' : 'Edit'}">New</span></nav>
+                <h1 class="app-page-title" th:text="${enrollment.id == null ? 'Create enrollment' : 'Update enrollment'}">Create enrollment</h1>
+                <p class="app-page-subtitle">Assign a student to a class and set the enrollment status.</p>
+            </div>
+            <div class="app-actions"><a th:href="@{/enrollments}" class="btn btn-app-secondary"><i class="fa-solid fa-arrow-left me-2"></i>Enrollment list</a></div>
+        </header>
+
+        <div class="row justify-content-center">
+            <div class="col-xl-8">
+                <div class="app-card">
+                    <h2 class="h6 mb-1">Enrollment information</h2><p class="small text-muted mb-4">Select the student, class, start date, and current status.</p>
+                    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                    <form th:action="@{/enrollments/save}" th:object="${enrollment}" method="post">
+                        <input type="hidden" th:field="*{id}">
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Student</label>
+                                <select th:field="*{studentId}" class="form-select" required>
+                                    <option value="">Select student</option>
+                                    <option th:each="student : ${students}" th:value="${student.id}"
+                                        th:text="${student.name + ' (' + student.phoneNumber + ')'}"></option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Class</label>
+                                <select th:field="*{trainingClassId}" class="form-select" required>
+                                    <option value="">Select class</option>
+                                    <option th:each="classItem : ${classes}" th:value="${classItem.id}"
+                                        th:text="${classItem.courseName + ' (' + #temporals.format(classItem.startTime, 'h a') + ' - ' + #temporals.format(classItem.endTime, 'h a') + ')'}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Enroll Date</label>
+                                <input type="date" th:field="*{enrollDate}" class="form-control" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Status</label>
+                                <select th:field="*{status}" class="form-select">
+                                    <option th:if="${enrollment.id == null}" value="">Select status</option>
+                                    <option th:each="status : ${statuses}" th:value="${status}" th:text="${status.label}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+                            <a th:href="@{/enrollments}" class="btn btn-app-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-app-primary">
+                                <i class="fas fa-save me-2"></i>
+                                <span th:text="${enrollment.id == null ? 'Save Enrollment' : 'Update Enrollment'}"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

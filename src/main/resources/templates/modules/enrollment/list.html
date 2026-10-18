@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layouts/layout :: layout(~{::section})}">
+<body>
+	<section>
+		<header class="app-page-header">
+			<div>
+				<nav class="app-breadcrumb" aria-label="Breadcrumb">
+					<a th:href="@{/dashboard}">Dashboard</a><span class="mx-2">/</span><span>Enrollments</span>
+				</nav>
+				<h1 class="app-page-title">Enrollment management</h1>
+				<p class="app-page-subtitle">Monitor student class assignments,
+					payment status, and outstanding balances.</p>
+			</div>
+			<div class="app-actions">
+				<a th:href="@{/enrollments/enroll}" class="btn btn-app-primary"><i
+					class="fa-solid fa-user-plus me-2"></i>New enrollment</a>
+			</div>
+		</header>
+		<div class="app-filter-card mb-4">
+			<form th:action="@{/enrollments}" method="get"
+				class="row g-3 align-items-end">
+				<div class="col-12 col-md-6 col-xl-5">
+					<label for="keyword" class="form-label">Search student</label>
+					<div class="position-relative">
+						<i
+							class="fa-solid fa-magnifying-glass position-absolute top-50 translate-middle-y ms-3 text-muted"></i><input
+							id="keyword" name="keyword" type="search"
+							class="form-control ps-5" placeholder="Student name"
+							th:value="${keyword}">
+					</div>
+				</div>
+				<div class="col-12 col-md-6 col-xl-4">
+					<label for="paymentStatus" class="form-label">Payment
+						status</label><select id="paymentStatus" name="paymentStatus"
+						class="form-select"><option value="">All payment
+							statuses</option>
+						<option th:each="status : ${paymentStatuses}" th:value="${status}"
+							th:text="${status.label}"
+							th:selected="${paymentStatus != null && paymentStatus.name() == status.name()}"></option></select>
+				</div>
+				<div class="col-12 col-xl-3 d-flex gap-2">
+					<button type="submit" class="btn btn-app-primary flex-grow-1">
+						<i class="fa-solid fa-filter me-2"></i>Apply filters
+					</button>
+					<a th:href="@{/enrollments}" class="btn btn-app-secondary"
+						title="Clear filters"><i class="fa-solid fa-rotate-left"></i></a>
+				</div>
+			</form>
+		</div>
+		<div class="app-table-card">
+			<div
+				class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 p-3 p-md-4 border-bottom">
+				<div>
+					<h2 class="h6 mb-1">Enrollment records</h2>
+					<p class="small text-muted mb-0"
+						th:text="${totalItems} + ' records found'">0 records found</p>
+				</div>
+				<span class="status-pill status-active"><i
+					class="fa-solid fa-users me-1"></i>Enrollment register</span>
+			</div>
+			<div th:if="${success}" class="alert alert-success m-3 mb-0"
+				role="status" th:text="${success}"></div>
+			<div th:if="${error}" class="alert alert-danger m-3 mb-0"
+				role="alert" th:text="${error}"></div>
+			<div class="table-responsive">
+				<table class="table app-table align-middle">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Student</th>
+							<th>Course</th>
+							<th>Payment status</th>
+							<th>Balance due</th>
+							<th class="text-end">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${#lists.isEmpty(enrollments)}">
+							<td colspan="6" class="text-center py-5 text-muted"><i
+								class="fa-regular fa-folder-open fa-lg d-block mb-2"></i>No
+								enrollment records match these filters.</td>
+						</tr>
+						<tr th:each="e, stat : ${enrollments}">
+							<td class="text-muted"
+								th:text="${(currentPage * pageSize) + stat.count}">1</td>
+							<td><div class="d-flex align-items-center gap-2">
+									<span class="app-avatar"
+										th:text="${#strings.isEmpty(e.studentName) ? 'S' : #strings.substring(e.studentName, 0, 1)}">S</span>
+									<div>
+										<div class="fw-semibold" th:text="${e.studentName}">Student
+											name</div>
+										<div class="small text-muted"
+											th:text="${e.fatherName != null && !#strings.isEmpty(e.fatherName) ? 'Guardian: ' + e.fatherName : 'Guardian not listed'}">Guardian</div>
+									</div>
+								</div></td>
+							<td th:text="${e.courseName}">Course</td>
+							<td><span class="status-pill"
+								th:classappend="${e.paymentStatus != null && e.paymentStatus.name() == 'PAID'} ? ' status-paid' : (${e.paymentStatus != null && e.paymentStatus.name() == 'PARTIAL'} ? ' status-partial' : ' status-inactive')"
+								th:text="${e.paymentStatus != null ? e.paymentStatus.label : 'Unpaid'}">Unpaid</span></td>
+							<td class="fw-semibold"
+								th:text="${e.balance != null ? #numbers.formatDecimal(e.balance, 1, 'COMMA', 2, 'POINT') : '0.00'}">0.00</td>
+							<td class="text-end"><a
+								th:if="${e.balance != null && e.balance > 0}"
+								th:href="@{/payments/create(enrollmentId=${e.enrollmentId})}"
+								class="btn btn-sm btn-app-secondary"
+								title="Pay remaining balance"><i
+									class="fa-solid fa-wallet me-sm-1"></i><span
+									class="d-none d-sm-inline">Record payment</span></a><span
+								th:if="${e.balance == null || e.balance <= 0}"
+								class="text-muted small">Settled</span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div th:replace="~{layouts/fragments/pagination :: pager('/enrollments', ${currentPage}, ${totalPages}, ${hasPrevious}, ${hasNext}, ${keyword}, null, null, null, null, null, ${paymentStatus})}"></div>
+		</div>
+	</section>
+</body>
+</html>
